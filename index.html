@@ -15,8 +15,6 @@
       min-height: 100vh;
     }
     .container { max-width: 1200px; margin: 0 auto; }
-    
-    /* Header */
     header {
       text-align: center;
       padding: 30px 20px;
@@ -36,8 +34,6 @@
       font-size: 1rem;
       margin-bottom: 15px;
     }
-    
-    /* Progress Bar */
     .progress-section {
       background: rgba(255,255,255,0.05);
       border-radius: 12px;
@@ -66,8 +62,6 @@
     .btn-reiniciar:hover {
       background: rgba(255,100,100,0.3);
     }
-    
-    /* Sections */
     .section {
       background: rgba(255,255,255,0.03);
       border-radius: 16px;
@@ -84,8 +78,6 @@
       align-items: center;
       gap: 8px;
     }
-    
-    /* Task Items */
     .task-item {
       display: flex;
       align-items: flex-start;
@@ -94,7 +86,6 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .task-item:last-child { border-bottom: none; }
-    
     .task-checkbox {
       width: 20px;
       height: 20px;
@@ -103,7 +94,6 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    
     .task-content { flex: 1; }
     .task-title {
       font-weight: 500;
@@ -114,8 +104,6 @@
       font-size: 0.9rem;
       color: #888;
     }
-    
-    /* Completed State */
     .task-checkbox:checked + .task-content .task-title,
     .task-item.completed .task-title {
       text-decoration: line-through;
@@ -131,8 +119,6 @@
       padding: 12px 15px;
       margin: 5px 0;
     }
-    
-    /* Roles Grid */
     .roles-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -167,16 +153,12 @@
       display: block;
       margin: 4px 0;
     }
-    
-    /* Loading */
     .loading {
       text-align: center;
       padding: 20px;
       color: #888;
       font-style: italic;
     }
-    
-    /* Responsive */
     @media (max-width: 768px) {
       .progress-section {
         flex-direction: column;
@@ -191,10 +173,9 @@
     <header>
       <h1>🎰 Beliora</h1>
       <p class="subtitle">📱 Flutter · Firebase · VS Code</p>
-      <p style="color:#666;font-size:0.95rem">Organigrama Interactivo · Roles · Módulos · Flujo IA · 12 Semanas — Ivan & Isaac</p>
+      <p style="color:#666;font-size:0.95rem">Beliora Organigrama · Roles · Módulos · Flujo IA · 12 Semanas — Ivan & Isaac</p>
     </header>
 
-    <!-- Progress Section -->
     <div class="progress-section">
       <div>
         <span style="color:#888">Progreso total del proyecto:</span>
@@ -204,13 +185,11 @@
       <div style="color:#888;font-size:0.9rem">👥 Equipo sincronizado</div>
     </div>
 
-    <!-- Roles Section -->
     <section class="section">
       <h2 class="section-title">👥 Estructura del Equipo</h2>
       <p style="color:#888;margin-bottom:15px">Roles, responsabilidades y archivos clave de cada integrante</p>
       
       <div class="roles-grid">
-        <!-- Ivan Role -->
         <div class="role-card">
           <div class="role-name">🎨 Ivan — Flutter UI Developer</div>
           <div style="color:#888;font-size:0.9rem;margin-bottom:10px">FRONTEND · DART · DISEÑO</div>
@@ -243,7 +222,7 @@
             <input type="checkbox" class="task-checkbox" id="ivan-player">
             <div class="task-content">
               <div class="task-title">▶️ player_screen.dart</div>
-              <div class="task-desc">Album art, barra progreso, controles ⏮▶⏸⏭, timer ⏱, AI✦, compartir ⬆</div>
+              <div class="task-desc">Album art, barra progreso, controles ⏮▶⏭, timer , AI✦, compartir ⬆</div>
             </div>
           </label>
           
@@ -256,7 +235,6 @@
           </label>
         </div>
 
-        <!-- Isaac Role -->
         <div class="role-card isaac">
           <div class="role-name">⚡ Isaac — Firebase Backend Developer</div>
           <div style="color:#888;font-size:0.9rem;margin-bottom:10px">BACKEND · NODE.JS · FIREBASE</div>
@@ -296,7 +274,6 @@
       </div>
     </section>
 
-    <!-- Shared Modules Section -->
     <section class="section">
       <h2 class="section-title">🤝 Módulos Compartidos</h2>
       <p style="color:#888;margin-bottom:15px">Ivan e Isaac definen estos archivos juntos antes de implementar por separado</p>
@@ -350,7 +327,6 @@
       </label>
     </section>
 
-    <!-- Tech Stack Section -->
     <section class="section">
       <h2 class="section-title">🛠 Stack Tecnológico</h2>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px">
@@ -365,7 +341,6 @@
       </div>
     </section>
 
-    <!-- Git Workflow Section -->
     <section class="section">
       <h2 class="section-title">🌿 Git Workflow</h2>
       <p style="color:#888;margin-bottom:15px">Cómo colaboran en el mismo repositorio sin pisarse</p>
@@ -403,12 +378,10 @@
       </label>
     </section>
 
-    <!-- 12 Weeks Plan Section -->
     <section class="section">
       <h2 class="section-title">📅 Plan de 12 Semanas</h2>
       <p style="color:#888;margin-bottom:15px">Tareas específicas por semana · Ivan y Isaac en paralelo · toca una tarea para marcarla</p>
       
-      <!-- Add your 12-week tasks here with unique IDs -->
       <label class="task-item">
         <input type="checkbox" class="task-checkbox" id="week1-setup">
         <div class="task-content">
@@ -432,17 +405,14 @@
           <div class="task-desc">Definir estructura de usuarios, sesiones y reglas de seguridad</div>
         </div>
       </label>
-      
-      <!-- Add more weeks as needed -->
     </section>
   </div>
 
-  <!-- Firebase + Logic -->
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getFirestore, doc, setDoc, onSnapshot, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    // 🔥 TU CONFIGURACIÓN DE FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyDSpASKuuNRurGompHXUfyjysyt1OF0ZKI",
       authDomain: "orgama-beliora.firebaseapp.com",
@@ -453,12 +423,11 @@
       measurementId: "G-QM2V43L48G"
     };
 
-    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const progresoRef = doc(db, 'progreso', 'organigrama_beliora');
 
-    // 📥 Cargar progreso guardado (TIEMPO REAL)
+    // 📥 Cargar progreso (TIEMPO REAL)
     onSnapshot(progresoRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -473,9 +442,8 @@
       }
     });
 
-    // 💾 Guardar cuando se marque/desmarque
+    // 💾 Guardar al marcar/desmarcar
     document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-      // Cargar estado inicial si ya existe en localStorage (fallback)
       const guardado = localStorage.getItem(checkbox.id);
       if (guardado === 'true' && !checkbox.checked) {
         checkbox.checked = true;
@@ -486,21 +454,17 @@
         const id = this.id;
         const completado = this.checked;
         
-        // Actualizar UI local
         if (completado) {
           this.closest('.task-item')?.classList.add('completed');
         } else {
           this.closest('.task-item')?.classList.remove('completed');
         }
         
-        // Guardar en localStorage (backup inmediato)
         localStorage.setItem(id, completado);
         
-        // Guardar en Firestore (sincronización en tiempo real)
         try {
           await updateDoc(progresoRef, { [id]: completado });
         } catch (error) {
-          // Si el documento no existe, lo crea con todos los valores actuales
           const todasLasTareas = {};
           document.querySelectorAll('.task-checkbox').forEach(cb => {
             todasLasTareas[cb.id] = cb.checked;
@@ -512,7 +476,6 @@
       });
     });
 
-    // 🔄 Actualizar contador de progreso
     function actualizarContador() {
       const checkboxes = document.querySelectorAll('.task-checkbox');
       const total = checkboxes.length;
@@ -523,7 +486,6 @@
       }
     }
 
-    // 🗑️ Botón Reiniciar
     document.getElementById('btnReiniciar')?.addEventListener('click', async () => {
       if (confirm('¿Reiniciar TODO el progreso? Esto afectará a Ivan e Isaac.')) {
         document.querySelectorAll('.task-checkbox').forEach(cb => {
@@ -536,7 +498,6 @@
       }
     });
 
-    // Inicializar contador al cargar
     document.addEventListener('DOMContentLoaded', actualizarContador);
   </script>
 </body>
