@@ -1,1237 +1,543 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beliora · Organigrama Interactivo</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap');
-
-:root {
-  --bg:      #09090f;
-  --card:    #12121a;
-  --card2:   #1a1a26;
-  --card3:   #1f1f2e;
-  --border:  #232333;
-  --border2: #2e2e45;
-  --relax:   #6b7fff;
-  --motive:  #a259ff;
-  --stoic:   #e03a3a;
-  --teal:    #3de8b0;
-  --gold:    #f0c040;
-  --text:    #eaeaf5;
-  --muted:   #6a6a88;
-  --muted2:  #45455e;
-}
-
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'DM Sans',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-
-/* ── AMBIENT BG ── */
-body::before{
-  content:'';
-  position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 55% 40% at 15% 15%, rgba(107,127,255,.06) 0%,transparent 70%),
-    radial-gradient(ellipse 45% 35% at 85% 80%, rgba(224,58,58,.05)   0%,transparent 70%),
-    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(162,89,255,.03)  0%,transparent 70%);
-}
-
-.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px 100px;}
-
-/* ── HEADER ── */
-header{
-  padding:48px 0 36px;
-  text-align:center;
-  border-bottom:1px solid var(--border);
-  margin-bottom:36px;
-  position:relative;
-}
-header::after{
-  content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:1px;
-  background:linear-gradient(90deg,var(--relax),var(--motive),var(--stoic));
-}
-.header-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(162,89,255,.1);border:1px solid rgba(162,89,255,.25);
-  color:var(--motive);font-family:'Syne',sans-serif;font-size:.65rem;
-  font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  padding:5px 14px;border-radius:99px;margin-bottom:16px;
-}
-header h1{
-  font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.2rem);
-  font-weight:800;line-height:1.1;margin-bottom:8px;
-}
-header h1 .g{
-  background:linear-gradient(90deg,var(--relax),var(--motive));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-header p{color:var(--muted);font-size:.9rem;max-width:500px;margin:0 auto 24px;}
-
-/* ── MASTER PROGRESS ── */
-.master-bar-wrap{
-  max-width:500px;margin:0 auto;
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:14px 18px;
-}
-.mb-top{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-bottom:8px;}
-.mb-top strong{color:var(--teal);font-family:'Syne',sans-serif;}
-.mb-track{height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
-.mb-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--relax),var(--motive),var(--stoic));transition:width .5s ease;}
-
-/* ── NAV TABS ── */
-.nav-tabs{
-  display:flex;gap:6px;flex-wrap:wrap;
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:6px;margin:28px 0;
-}
-.tab-btn{
-  flex:1;min-width:120px;
-  background:transparent;border:none;
-  color:var(--muted);font-family:'Syne',sans-serif;
-  font-size:.72rem;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;padding:10px 16px;
-  border-radius:10px;cursor:pointer;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:7px;
-}
-.tab-btn:hover{color:var(--text);background:var(--card2);}
-.tab-btn.active{background:var(--card2);color:var(--text);}
-.tab-btn.active[data-tab="equipo"]  {color:var(--relax);border:1px solid rgba(107,127,255,.25);}
-.tab-btn.active[data-tab="modulos"] {color:var(--motive);border:1px solid rgba(162,89,255,.25);}
-.tab-btn.active[data-tab="flujo"]   {color:var(--teal);border:1px solid rgba(61,232,176,.25);}
-.tab-btn.active[data-tab="semanas"] {color:var(--gold);border:1px solid rgba(240,192,64,.25);}
-.tab-dot{width:7px;height:7px;border-radius:50%;}
-
-/* ── TAB PANELS ── */
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
-/* ── SECTION TITLE ── */
-.sec-title{
-  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
-  margin-bottom:6px;
-}
-.sec-sub{color:var(--muted);font-size:.82rem;margin-bottom:22px;}
-
-/* ══════════════════════════════════════
-   TAB 1 — EQUIPO
-══════════════════════════════════════ */
-.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-
-.person-card{
-  background:var(--card);border-radius:18px;
-  border:1px solid var(--border);overflow:hidden;
-  transition:border-color .3s;
-}
-.person-card.ivan { border-top:3px solid var(--relax); }
-.person-card.isaac{ border-top:3px solid var(--stoic); }
-
-.pc-header{
-  display:flex;align-items:center;gap:14px;
-  padding:20px 22px 16px;
-  border-bottom:1px solid var(--border);
-}
-.pc-avatar{
-  width:52px;height:52px;border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;
-  flex-shrink:0;
-}
-.ivan .pc-avatar{background:rgba(107,127,255,.15);color:var(--relax);border:1.5px solid rgba(107,127,255,.35);}
-.isaac .pc-avatar{background:rgba(224,58,58,.15);color:var(--stoic);border:1.5px solid rgba(224,58,58,.35);}
-.pc-name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;}
-.pc-role{font-size:.75rem;color:var(--muted);margin-top:3px;}
-.pc-tag{
-  display:inline-block;font-size:.6rem;font-family:'Syne',sans-serif;
-  font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  padding:3px 10px;border-radius:6px;margin-top:6px;
-}
-.ivan .pc-tag{background:rgba(107,127,255,.12);color:var(--relax);}
-.isaac .pc-tag{background:rgba(224,58,58,.12);color:var(--stoic);}
-
-.pc-body{padding:16px 22px;}
-
-.module-group{margin-bottom:16px;}
-.mg-title{
-  font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;
-  margin-bottom:8px;padding-bottom:6px;
-  border-bottom:1px solid var(--border);
-}
-.ivan .mg-title{color:var(--relax);}
-.isaac .mg-title{color:var(--stoic);}
-
-.file-item{
-  display:flex;align-items:flex-start;gap:10px;
-  padding:8px 10px;border-radius:8px;margin-bottom:4px;
-  background:var(--card2);border:1px solid transparent;
-  transition:all .2s;cursor:pointer;
-}
-.file-item:hover{border-color:var(--border2);background:var(--card3);}
-.file-item.done{opacity:.55;}
-.file-item.done .fi-name{text-decoration:line-through;color:var(--muted);}
-
-.fi-check{
-  width:16px;height:16px;border-radius:5px;
-  border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;font-weight:900;transition:all .2s;
-}
-.ivan .fi-check.checked{background:var(--relax);border-color:var(--relax);color:#09090f;}
-.isaac .fi-check.checked{background:var(--stoic);border-color:var(--stoic);color:#09090f;}
-
-.fi-info{flex:1;min-width:0;}
-.fi-name{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text);line-height:1.3;}
-.fi-desc{font-size:.72rem;color:var(--muted);line-height:1.4;margin-top:2px;}
-
-/* Shared card */
-.shared-card{
-  background:var(--card);border:1px solid rgba(162,89,255,.3);
-  border-radius:18px;padding:20px 22px;margin-bottom:16px;
-  border-top:3px solid var(--motive);
-}
-.shared-card .sec-title{color:var(--motive);}
-.shared-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.shared-item{
-  background:var(--card2);border:1px solid rgba(162,89,255,.15);
-  border-radius:10px;padding:10px 12px;
-}
-.si-name{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--motive);}
-.si-desc{font-size:.7rem;color:var(--muted);margin-top:4px;line-height:1.45;}
-
-/* Stack badges */
-.stack-wrap{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:18px;padding:20px 22px;
-}
-.stack-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-.stack-badge{
-  display:flex;align-items:center;gap:8px;
-  background:var(--card2);border:1px solid var(--border2);
-  border-radius:10px;padding:8px 12px;
-}
-.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.sb-name{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;}
-.sb-sub{font-size:.65rem;color:var(--muted);margin-top:1px;}
-
-/* ══════════════════════════════════════
-   TAB 2 — MÓDULOS
-══════════════════════════════════════ */
-.modules-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-
-.mod-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;overflow:hidden;
-}
-.mod-header{
-  padding:12px 16px;
-  display:flex;align-items:center;justify-content:space-between;
-  cursor:pointer;user-select:none;
-}
-.mh-left{display:flex;align-items:center;gap:10px;}
-.mh-icon{
-  width:32px;height:32px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;font-size:.85rem;
-}
-.mh-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;}
-.mh-owner{font-size:.62rem;color:var(--muted);margin-top:2px;}
-.mh-toggle{color:var(--muted);font-size:.9rem;transition:transform .3s;}
-.mod-card.open .mh-toggle{transform:rotate(45deg);}
-.mh-progress{
-  font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;
-  padding:3px 9px;border-radius:6px;
-}
-
-.mod-body{
-  display:none;padding:0 16px 16px;
-  border-top:1px solid var(--border);
-}
-.mod-card.open .mod-body{display:block;}
-
-.mod-file{
-  display:flex;align-items:flex-start;gap:10px;
-  padding:9px 10px;border-radius:8px;margin-top:6px;
-  background:var(--card2);border:1px solid transparent;
-  cursor:pointer;transition:all .2s;
-}
-.mod-file:hover{border-color:var(--border2);}
-.mod-file.done{opacity:.5;}
-.mod-file.done .mf-name{text-decoration:line-through;}
-.mf-check{
-  width:16px;height:16px;border-radius:5px;border:1.5px solid var(--border2);
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;font-weight:900;transition:all .15s;margin-top:1px;
-}
-.mf-name{font-family:'DM Mono',monospace;font-size:.7rem;line-height:1.3;}
-.mf-desc{font-size:.7rem;color:var(--muted);margin-top:2px;line-height:1.4;}
-.mod-bar-wrap{height:3px;background:var(--border);border-radius:99px;margin:12px 0 4px;overflow:hidden;}
-.mod-bar{height:100%;border-radius:99px;transition:width .4s ease;}
-
-/* ══════════════════════════════════════
-   TAB 3 — FLUJO IA
-══════════════════════════════════════ */
-.flow-wrap{max-width:860px;margin:0 auto;}
-
-.flow-intro{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:18px 22px;margin-bottom:24px;
-  border-left:3px solid var(--teal);
-}
-.flow-intro p{color:var(--muted);font-size:.85rem;line-height:1.6;}
-
-.flow-steps{display:flex;flex-direction:column;gap:0;}
-
-.flow-step{
-  display:flex;gap:0;
-  position:relative;
-}
-
-.fs-left{
-  display:flex;flex-direction:column;align-items:center;
-  flex-shrink:0;width:52px;
-}
-.fs-num{
-  width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;
-  flex-shrink:0;z-index:1;
-}
-.fs-line{width:2px;flex:1;min-height:20px;margin:4px 0;}
-.flow-step:last-child .fs-line{display:none;}
-
-.fs-content{
-  flex:1;padding:0 0 24px 16px;
-}
-.fs-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:14px 16px;
-  transition:border-color .2s;
-}
-.fs-card:hover{border-color:var(--border2);}
-
-.fc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.fc-title{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;}
-.fc-owner{font-size:.65rem;padding:3px 9px;border-radius:6px;}
-.fc-desc{font-size:.8rem;color:var(--muted);line-height:1.55;}
-.fc-tech{
-  display:inline-flex;align-items:center;gap:6px;
-  font-family:'DM Mono',monospace;font-size:.65rem;
-  color:var(--muted2);margin-top:8px;
-  background:var(--card2);padding:4px 10px;border-radius:6px;
-}
-
-/* Git flow */
-.git-wrap{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:20px 22px;margin-top:28px;
-}
-.branch-item{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 12px;border-radius:9px;
-  background:var(--card2);border:1px solid var(--border);
-  margin-bottom:8px;
-}
-.bi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.bi-name{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text);min-width:160px;}
-.bi-desc{font-size:.75rem;color:var(--muted);}
-
-/* ══════════════════════════════════════
-   TAB 4 — 12 SEMANAS
-══════════════════════════════════════ */
-.phase-section{margin-bottom:28px;}
-.phase-header{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 16px;border-radius:10px;margin-bottom:10px;
-}
-.ph-label{
-  font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;
-  padding:4px 12px;border-radius:6px;
-}
-.ph-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;}
-.ph-weeks{font-size:.75rem;color:var(--muted);}
-
-.weeks-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-
-.week-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;overflow:hidden;
-  transition:border-color .3s;
-}
-.week-card.all-done{border-color:rgba(61,232,176,.35);}
-
-.wc-header{
-  display:flex;align-items:center;gap:12px;
-  padding:14px 16px;cursor:pointer;user-select:none;
-  border-bottom:1px solid transparent;transition:border-color .3s;
-}
-.week-card.open .wc-header{border-bottom-color:var(--border);}
-
-.wc-num{
-  width:38px;height:38px;border-radius:10px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  flex-shrink:0;font-family:'Syne',sans-serif;
-}
-.wc-num .wn-s{font-size:.55rem;font-weight:700;letter-spacing:.1em;opacity:.7;}
-.wc-num .wn-n{font-size:1rem;font-weight:800;line-height:1;}
-
-.wc-info{flex:1;}
-.wc-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;line-height:1.3;}
-.wc-sub{font-size:.68rem;color:var(--muted);margin-top:2px;}
-
-.wc-right{display:flex;align-items:center;gap:8px;}
-.wc-pct{font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;color:var(--teal);}
-.wc-tog{color:var(--muted);font-size:1rem;transition:transform .3s;}
-.week-card.open .wc-tog{transform:rotate(45deg);}
-
-.wc-body{display:none;padding:0 16px 14px;}
-.week-card.open .wc-body{display:block;}
-
-.owner-section{margin-top:12px;}
-.os-label{
-  font-size:.6rem;font-family:'Syne',sans-serif;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;
-  padding:4px 10px;border-radius:6px;margin-bottom:8px;display:inline-block;
-}
-
-.week-task{
-  display:flex;align-items:flex-start;gap:9px;
-  padding:8px 10px;border-radius:8px;margin-bottom:4px;
-  background:var(--card2);cursor:pointer;
-  border:1px solid transparent;transition:all .2s;
-}
-.week-task:hover{border-color:var(--border2);}
-.week-task.done{opacity:.5;}
-.week-task.done .wt-text{text-decoration:line-through;color:var(--muted);}
-.wt-check{
-  width:16px;height:16px;border-radius:5px;border:1.5px solid var(--border2);
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;font-weight:900;transition:all .15s;margin-top:1px;
-}
-.wt-text{font-size:.76rem;line-height:1.45;}
-
-.wc-mini-bar{
-  height:3px;background:var(--border);border-radius:99px;
-  margin:10px 0 0;overflow:hidden;
-}
-.wcmb-fill{height:100%;border-radius:99px;transition:width .4s ease;}
-
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:28px;left:50%;
-  transform:translateX(-50%) translateY(60px);
-  background:var(--card);border:1px solid var(--teal);
-  color:var(--teal);font-family:'Syne',sans-serif;
-  font-size:.78rem;font-weight:700;
-  padding:10px 22px;border-radius:99px;
-  pointer-events:none;transition:transform .4s,opacity .4s;
-  opacity:0;z-index:999;white-space:nowrap;
-}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-
-/* ── RESET BTN ── */
-.reset-btn{
-  background:transparent;border:1px solid var(--border2);
-  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.72rem;
-  padding:7px 18px;border-radius:99px;cursor:pointer;transition:all .2s;
-  margin-top:8px;
-}
-.reset-btn:hover{border-color:var(--stoic);color:var(--stoic);}
-
-@media(max-width:680px){
-  .team-grid,.modules-layout,.weeks-grid,.shared-grid{grid-template-columns:1fr;}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beliora · Organigrama Interactivo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Syne', 'DM Sans', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    /* Header */
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 30px;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00ff88, #7b61ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+    
+    /* Progress Bar */
+    .progress-section {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    .progreso-texto {
+      font-weight: 600;
+      color: #00ff88;
+    }
+    .btn-reiniciar {
+      background: rgba(255,100,100,0.2);
+      color: #ff6b6b;
+      border: 1px solid rgba(255,100,100,0.4);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .btn-reiniciar:hover {
+      background: rgba(255,100,100,0.3);
+    }
+    
+    /* Sections */
+    .section {
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Task Items */
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .task-item:last-child { border-bottom: none; }
+    
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: #00ff88;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    
+    .task-content { flex: 1; }
+    .task-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .task-desc {
+      font-size: 0.9rem;
+      color: #888;
+    }
+    
+    /* Completed State */
+    .task-checkbox:checked + .task-content .task-title,
+    .task-item.completed .task-title {
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+    .task-checkbox:checked + .task-content .task-desc,
+    .task-item.completed .task-desc {
+      opacity: 0.4;
+    }
+    .task-item.completed {
+      background: rgba(0, 255, 136, 0.08);
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 5px 0;
+    }
+    
+    /* Roles Grid */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 15px;
+    }
+    .role-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 15px;
+      border-left: 3px solid #7b61ff;
+    }
+    .role-card.isaac { border-left-color: #00ff88; }
+    .role-name {
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .role-files {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-top: 10px;
+    }
+    .role-files code {
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      display: block;
+      margin: 4px 0;
+    }
+    
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-style: italic;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .progress-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      h1 { font-size: 1.5rem; }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>🎰 Beliora</h1>
+      <p class="subtitle">📱 Flutter · Firebase · VS Code</p>
+      <p style="color:#666;font-size:0.95rem">Organigrama Interactivo · Roles · Módulos · Flujo IA · 12 Semanas — Ivan & Isaac</p>
+    </header>
 
-<div class="wrap">
-
-<!-- HEADER -->
-<header>
-  <div class="header-badge">📱 Flutter · Firebase · VS Code</div>
-  <h1><span class="g">Beliora</span> Organigrama</h1>
-  <p>Roles · Módulos · Flujo IA · 12 Semanas — Ivan & Isaac</p>
-
-  <div class="master-bar-wrap">
-    <div class="mb-top">
-      <span>Progreso total del proyecto</span>
-      <strong id="masterPct">0 / 0 tareas</strong>
+    <!-- Progress Section -->
+    <div class="progress-section">
+      <div>
+        <span style="color:#888">Progreso total del proyecto:</span>
+        <strong class="progreso-texto">0 / 0 tareas</strong>
+      </div>
+      <button class="btn-reiniciar" id="btnReiniciar">↺ Reiniciar progreso</button>
+      <div style="color:#888;font-size:0.9rem">👥 Equipo sincronizado</div>
     </div>
-    <div class="mb-track"><div class="mb-fill" id="masterFill" style="width:0%"></div></div>
-  </div>
-  <button class="reset-btn" onclick="resetAll()">↺ Reiniciar progreso</button>
-</header>
 
-<!-- NAV TABS -->
-<div class="nav-tabs">
-  <button class="tab-btn active" data-tab="equipo"  onclick="switchTab('equipo')">
-    <div class="tab-dot" style="background:var(--relax)"></div> 👥 Equipo
-  </button>
-  <button class="tab-btn" data-tab="modulos" onclick="switchTab('modulos')">
-    <div class="tab-dot" style="background:var(--motive)"></div> 📦 Módulos
-  </button>
-  <button class="tab-btn" data-tab="flujo" onclick="switchTab('flujo')">
-    <div class="tab-dot" style="background:var(--teal)"></div> ⚡ Flujo IA
-  </button>
-  <button class="tab-btn" data-tab="semanas" onclick="switchTab('semanas')">
-    <div class="tab-dot" style="background:var(--gold)"></div> 📅 12 Semanas
-  </button>
-</div>
+    <!-- Roles Section -->
+    <section class="section">
+      <h2 class="section-title">👥 Estructura del Equipo</h2>
+      <p style="color:#888;margin-bottom:15px">Roles, responsabilidades y archivos clave de cada integrante</p>
+      
+      <div class="roles-grid">
+        <!-- Ivan Role -->
+        <div class="role-card">
+          <div class="role-name">🎨 Ivan — Flutter UI Developer</div>
+          <div style="color:#888;font-size:0.9rem;margin-bottom:10px">FRONTEND · DART · DISEÑO</div>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="ivan-splash">
+            <div class="task-content">
+              <div class="task-title">📱 splash_screen.dart</div>
+              <div class="task-desc">Canvas mercury animado, logo placeholder, frases random, timer 3s → Login</div>
+            </div>
+          </label>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="ivan-login">
+            <div class="task-content">
+              <div class="task-title">🔐 login_screen.dart</div>
+              <div class="task-desc">Form Email/Pass, botón Login blanco, Google y Facebook auth, link Ayuda</div>
+            </div>
+          </label>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="ivan-home">
+            <div class="task-content">
+              <div class="task-title">🏠 home_screen.dart</div>
+              <div class="task-desc">Switch Relax/Motivate/Stoic, campo IA dinámico, grilla S1-Sn, mini player, nav bar</div>
+            </div>
+          </label>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="ivan-player">
+            <div class="task-content">
+              <div class="task-title">▶️ player_screen.dart</div>
+              <div class="task-desc">Album art, barra progreso, controles ⏮▶⏸⏭, timer ⏱, AI✦, compartir ⬆</div>
+            </div>
+          </label>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="ivan-settings">
+            <div class="task-content">
+              <div class="task-title">⚙️ settings_screen.dart</div>
+              <div class="task-desc">Avatar, nombre, 6 filas (Account / Notifs / Appearance / Privacy / Help / About)</div>
+            </div>
+          </label>
+        </div>
 
-<!-- ══════════════════════════════════
-     TAB 1 — EQUIPO
-══════════════════════════════════ -->
-<div class="tab-panel active" id="tab-equipo">
-
-  <div class="sec-title">Estructura del Equipo</div>
-  <div class="sec-sub">Roles, responsabilidades y archivos clave de cada integrante</div>
-
-  <div class="team-grid">
-
-    <!-- IVAN -->
-    <div class="person-card ivan">
-      <div class="pc-header">
-        <div class="pc-avatar">I</div>
-        <div>
-          <div class="pc-name">Ivan</div>
-          <div class="pc-role">Flutter UI Developer</div>
-          <div class="pc-tag">FRONTEND · DART · DISEÑO</div>
+        <!-- Isaac Role -->
+        <div class="role-card isaac">
+          <div class="role-name">⚡ Isaac — Firebase Backend Developer</div>
+          <div style="color:#888;font-size:0.9rem;margin-bottom:10px">BACKEND · NODE.JS · FIREBASE</div>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="isaac-auth">
+            <div class="task-content">
+              <div class="task-title">🔐 auth_service.dart</div>
+              <div class="task-desc">signInEmail(), signInGoogle(), signInFacebook(), signOut(), getUser()</div>
+            </div>
+          </label>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="isaac-firestore">
+            <div class="task-content">
+              <div class="task-title">🗄 firestore_service.dart</div>
+              <div class="task-desc">getUser(), saveSession(), getSessions(), updatePlan(), deleteAccount()</div>
+            </div>
+          </label>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="isaac-functions">
+            <div class="task-content">
+              <div class="task-title">⚡ Cloud Functions</div>
+              <div class="task-desc">generateSession.js, generateAudio.js, mixAudio.js, deleteUserData.js</div>
+            </div>
+          </label>
+          
+          <label class="task-item">
+            <input type="checkbox" class="task-checkbox" id="isaac-revenuecat">
+            <div class="task-content">
+              <div class="task-title">💳 revenuecat_service.dart</div>
+              <div class="task-desc">configureSDK(), getOfferings(), purchasePremium(), restorePurchases()</div>
+            </div>
+          </label>
         </div>
       </div>
-      <div class="pc-body">
+    </section>
 
-        <div class="module-group">
-          <div class="mg-title">📱 Screens</div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">splash_screen.dart</div>
-              <div class="fi-desc">Canvas mercury animado, logo placeholder, frases random, timer 3s → Login</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">login_screen.dart</div>
-              <div class="fi-desc">Form Email/Pass, botón Login blanco, Google y Facebook auth, link Ayuda</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">home_screen.dart</div>
-              <div class="fi-desc">Switch Relax/Motivate/Stoic, campo IA dinámico, grilla S1-Sn, mini player, nav bar</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">player_screen.dart</div>
-              <div class="fi-desc">Album art, barra progreso, controles ⏮▶⏸⏭, timer ⏱, AI✦, compartir ⬆</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">settings_screen.dart</div>
-              <div class="fi-desc">Avatar, nombre, 6 filas (Account / Notifs / Appearance / Privacy / Help / About)</div>
-            </div>
-          </div>
+    <!-- Shared Modules Section -->
+    <section class="section">
+      <h2 class="section-title">🤝 Módulos Compartidos</h2>
+      <p style="color:#888;margin-bottom:15px">Ivan e Isaac definen estos archivos juntos antes de implementar por separado</p>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="shared-usermodel">
+        <div class="task-content">
+          <div class="task-title">👤 user_model.dart</div>
+          <div class="task-desc">Clase User compartida · Ivan la usa en UI, Isaac en Firestore</div>
         </div>
-
-        <div class="module-group">
-          <div class="mg-title">🧩 Widgets</div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">mode_switch.dart</div>
-              <div class="fi-desc">Pill deslizable 3 modos · cambia color de toda la UI al deslizar</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">session_card.dart</div>
-              <div class="fi-desc">Card con thumbnail fluid · label Sn · tap → Player</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">mini_player.dart</div>
-              <div class="fi-desc">Barra inferior fija · thumbnail 44px · título · play/pause · tap → Player full</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">loading_dots.dart</div>
-              <div class="fi-desc">3 puntos animados reutilizables · Splash + carga IA</div>
-            </div>
-          </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="shared-sessionmodel">
+        <div class="task-content">
+          <div class="task-title">📦 session_model.dart</div>
+          <div class="task-desc">Estructura de una sesión generada · campos acordados por ambos</div>
         </div>
-
-        <div class="module-group">
-          <div class="mg-title">🗂 Estado & Navegación</div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">app_state.dart</div>
-              <div class="fi-desc">Estado global: modo activo, usuario actual, sesión reproduciendo</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">router.dart</div>
-              <div class="fi-desc">/splash → /login → /home → /player → /settings</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'ivan')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">theme.dart</div>
-              <div class="fi-desc">ThemeData por modo · Syne + DM Sans · colores, radios, spacing</div>
-            </div>
-          </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="shared-apicontracts">
+        <div class="task-content">
+          <div class="task-title">📡 api_contracts.md</div>
+          <div class="task-desc">Qué recibe y qué retorna cada Cloud Function · contrato firmado</div>
         </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="shared-errors">
+        <div class="task-content">
+          <div class="task-title">⚠️ error_codes.dart</div>
+          <div class="task-desc">Enum de errores: noInternet, authFailed, quotaExceeded, etc.</div>
+        </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="shared-constants">
+        <div class="task-content">
+          <div class="task-title">🔢 constants.dart</div>
+          <div class="task-desc">Duraciones, modos, versión, base URLs · única fuente de verdad</div>
+        </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="shared-tests">
+        <div class="task-content">
+          <div class="task-title">🧪 integration tests/</div>
+          <div class="task-desc">Tests UI + backend real en emulador Firebase · testing conjunto</div>
+        </div>
+      </label>
+    </section>
 
+    <!-- Tech Stack Section -->
+    <section class="section">
+      <h2 class="section-title">🛠 Stack Tecnológico</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px">
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">🎨 Flutter UI</div>
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">💻 VS Code IDE</div>
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">🔐 Firebase Auth+Firestore</div>
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">⚡ Cloud Functions</div>
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">🤖 Claude API</div>
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">🔊 ElevenLabs TTS</div>
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">💳 RevenueCat</div>
+        <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px">🐙 Git + GitHub</div>
       </div>
-    </div>
+    </section>
 
-    <!-- ISAAC -->
-    <div class="person-card isaac">
-      <div class="pc-header">
-        <div class="pc-avatar">IS</div>
-        <div>
-          <div class="pc-name">Isaac</div>
-          <div class="pc-role">Firebase Backend Developer</div>
-          <div class="pc-tag">BACKEND · NODE.JS · FIREBASE</div>
+    <!-- Git Workflow Section -->
+    <section class="section">
+      <h2 class="section-title">🌿 Git Workflow</h2>
+      <p style="color:#888;margin-bottom:15px">Cómo colaboran en el mismo repositorio sin pisarse</p>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="git-main">
+        <div class="task-content">
+          <div class="task-title">📦 main</div>
+          <div class="task-desc">Código estable · solo merge por Pull Request aprobado por ambos</div>
         </div>
-      </div>
-      <div class="pc-body">
-
-        <div class="module-group">
-          <div class="mg-title">🔐 Firebase Auth</div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">auth_service.dart</div>
-              <div class="fi-desc">signInEmail(), signInGoogle(), signInFacebook(), signOut(), getUser()</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">google-services.json</div>
-              <div class="fi-desc">Config Android · SHA-1 registrado · Firebase project vinculado</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">FacebookApp config</div>
-              <div class="fi-desc">App ID + Secret en developers.facebook.com · OAuth Redirect URI</div>
-            </div>
-          </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="git-develop">
+        <div class="task-content">
+          <div class="task-title">🔀 develop</div>
+          <div class="task-desc">Rama de integración · aquí se unen frontend y backend cada semana</div>
         </div>
-
-        <div class="module-group">
-          <div class="mg-title">🗄 Firestore Database</div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">firestore_service.dart</div>
-              <div class="fi-desc">getUser(), saveSession(), getSessions(), updatePlan(), deleteAccount()</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">schema: /users/{uid}</div>
-              <div class="fi-desc">{ uid, name, email, plan, sessions[], createdAt, lastLogin }</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">security_rules.rules</div>
-              <div class="fi-desc">Solo el uid propietario puede leer/escribir sus datos</div>
-            </div>
-          </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="git-ivan">
+        <div class="task-content">
+          <div class="task-title">🎨 ivan/*</div>
+          <div class="task-desc">Ramas de Ivan para cada pantalla o feature UI · ej: ivan/player-screen</div>
         </div>
-
-        <div class="module-group">
-          <div class="mg-title">⚡ Cloud Functions</div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">generateSession.js</div>
-              <div class="fi-desc">Recibe {text, mode, name, duration} → Claude API → retorna script</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">generateAudio.js</div>
-              <div class="fi-desc">Script → ElevenLabs TTS → MP3 a Storage → retorna URL</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">mixAudio.js</div>
-              <div class="fi-desc">Mezcla voz (80%) + música ambient del modo (30%) → archivo final</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">deleteUserData.js</div>
-              <div class="fi-desc">Trigger on delete account → elimina Firestore + Storage del usuario</div>
-            </div>
-          </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="git-isaac">
+        <div class="task-content">
+          <div class="task-title">⚡ isaac/*</div>
+          <div class="task-desc">Ramas de Isaac para servicios Firebase · ej: isaac/revenuecat-setup</div>
         </div>
+      </label>
+    </section>
 
-        <div class="module-group">
-          <div class="mg-title">💳 RevenueCat</div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">revenuecat_service.dart</div>
-              <div class="fi-desc">configureSDK(), getOfferings(), purchasePremium(), restorePurchases()</div>
-            </div>
-          </div>
-          <div class="file-item" onclick="toggleFile(this,'isaac')">
-            <div class="fi-check"></div>
-            <div class="fi-info">
-              <div class="fi-name">entitlement_check.dart</div>
-              <div class="fi-desc">checkPremium() → bool · bloquea Free tier en Home/Player</div>
-            </div>
-          </div>
+    <!-- 12 Weeks Plan Section -->
+    <section class="section">
+      <h2 class="section-title">📅 Plan de 12 Semanas</h2>
+      <p style="color:#888;margin-bottom:15px">Tareas específicas por semana · Ivan y Isaac en paralelo · toca una tarea para marcarla</p>
+      
+      <!-- Add your 12-week tasks here with unique IDs -->
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="week1-setup">
+        <div class="task-content">
+          <div class="task-title">🗓️ Semana 1: Setup inicial</div>
+          <div class="task-desc">Configurar repositorio, Firebase project, estructura de carpetas</div>
         </div>
-
-      </div>
-    </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="week2-auth">
+        <div class="task-content">
+          <div class="task-title">🔐 Semana 2: Autenticación</div>
+          <div class="task-desc">Ivan: UI login | Isaac: Firebase Auth + Google/Facebook</div>
+        </div>
+      </label>
+      
+      <label class="task-item">
+        <input type="checkbox" class="task-checkbox" id="week3-firestore">
+        <div class="task-content">
+          <div class="task-title">🗄 Semana 3: Firestore Schema</div>
+          <div class="task-desc">Definir estructura de usuarios, sesiones y reglas de seguridad</div>
+        </div>
+      </label>
+      
+      <!-- Add more weeks as needed -->
+    </section>
   </div>
 
-  <!-- SHARED -->
-  <div class="shared-card">
-    <div class="sec-title" style="margin-bottom:4px;">🤝 Módulos Compartidos</div>
-    <div class="sec-sub" style="margin-bottom:14px;">Ivan e Isaac definen estos archivos juntos antes de implementar por separado</div>
-    <div class="shared-grid">
-      <div class="shared-item"><div class="si-name">user_model.dart</div><div class="si-desc">Clase User compartida · Ivan la usa en UI, Isaac en Firestore</div></div>
-      <div class="shared-item"><div class="si-name">session_model.dart</div><div class="si-desc">Estructura de una sesión generada · campos acordados por ambos</div></div>
-      <div class="shared-item"><div class="si-name">api_contracts.md</div><div class="si-desc">Qué recibe y qué retorna cada Cloud Function · contrato firmado</div></div>
-      <div class="shared-item"><div class="si-name">error_codes.dart</div><div class="si-desc">Enum de errores: noInternet, authFailed, quotaExceeded, etc.</div></div>
-      <div class="shared-item"><div class="si-name">constants.dart</div><div class="si-desc">Duraciones, modos, versión, base URLs · única fuente de verdad</div></div>
-      <div class="shared-item"><div class="si-name">integration tests/</div><div class="si-desc">Tests UI + backend real en emulador Firebase · testing conjunto</div></div>
-    </div>
-  </div>
+  <!-- Firebase + Logic -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, doc, setDoc, onSnapshot, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-  <!-- STACK -->
-  <div class="stack-wrap">
-    <div class="sec-title">🛠 Stack Tecnológico</div>
-    <div class="stack-grid">
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--relax)"></div><div><div class="sb-name">Flutter</div><div class="sb-sub">UI Framework</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--relax)"></div><div><div class="sb-name">VS Code</div><div class="sb-sub">IDE + Extensiones Dart</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--stoic)"></div><div><div class="sb-name">Firebase</div><div class="sb-sub">Auth + Firestore + Storage</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--stoic)"></div><div><div class="sb-name">Cloud Functions</div><div class="sb-sub">Node.js Serverless</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--motive)"></div><div><div class="sb-name">Claude API</div><div class="sb-sub">Generación de guiones IA</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--motive)"></div><div><div class="sb-name">ElevenLabs</div><div class="sb-sub">Text-to-Speech MP3</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--teal)"></div><div><div class="sb-name">RevenueCat</div><div class="sb-sub">Suscripciones iOS + Android</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--teal)"></div><div><div class="sb-name">Dart</div><div class="sb-sub">Lenguaje de Flutter</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--gold)"></div><div><div class="sb-name">Git + GitHub</div><div class="sb-sub">Control de versiones</div></div></div>
-      <div class="stack-badge"><div class="sb-dot" style="background:var(--gold)"></div><div><div class="sb-name">Crashlytics</div><div class="sb-sub">Monitoreo de errores</div></div></div>
-    </div>
-  </div>
+    // 🔥 TU CONFIGURACIÓN DE FIREBASE
+    const firebaseConfig = {
+      apiKey: "AIzaSyDSpASKuuNRurGompHXUfyjysyt1OF0ZKI",
+      authDomain: "orgama-beliora.firebaseapp.com",
+      projectId: "orgama-beliora",
+      storageBucket: "orgama-beliora.firebasestorage.app",
+      messagingSenderId: "1002070343736",
+      appId: "1:1002070343736:web:4ddb91667a8700c12be6cd",
+      measurementId: "G-QM2V43L48G"
+    };
 
-</div><!-- /tab-equipo -->
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const progresoRef = doc(db, 'progreso', 'organigrama_beliora');
 
-
-<!-- ══════════════════════════════════
-     TAB 2 — MÓDULOS
-══════════════════════════════════ -->
-<div class="tab-panel" id="tab-modulos">
-  <div class="sec-title">Árbol de Módulos</div>
-  <div class="sec-sub">Todos los archivos del proyecto organizados por carpeta · haz clic para marcar como completado</div>
-
-  <div class="modules-layout" id="modulesLayout">
-    <!-- generated by JS -->
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════
-     TAB 3 — FLUJO IA
-══════════════════════════════════ -->
-<div class="tab-panel" id="tab-flujo">
-
-  <div class="sec-title">Flujo Completo — Sesión IA</div>
-  <div class="sec-sub">Los 9 pasos desde que Ivan escribe hasta que el audio suena en el Player</div>
-
-  <div class="flow-wrap">
-    <div class="flow-intro">
-      <p>Este es el corazón de Beliora. Ivan construye la UI de entrada y salida. Isaac construye la cadena de servicios en el backend. Ambos se coordinan en los puntos 2 y 8 donde Flutter y Firebase se comunican.</p>
-    </div>
-
-    <div class="flow-steps" id="flowSteps">
-      <!-- generated by JS -->
-    </div>
-
-    <!-- GIT WORKFLOW -->
-    <div class="git-wrap">
-      <div class="sec-title" style="margin-bottom:4px;">🌿 Git Workflow</div>
-      <div class="sec-sub" style="margin-bottom:14px;">Cómo colaboran en el mismo repositorio sin pisarse</div>
-      <div class="branch-item"><div class="bi-dot" style="background:var(--teal)"></div><div class="bi-name">main</div><div class="bi-desc">Código estable · solo merge por Pull Request aprobado por ambos</div></div>
-      <div class="branch-item"><div class="bi-dot" style="background:var(--gold)"></div><div class="bi-name">develop</div><div class="bi-desc">Rama de integración · aquí se unen frontend y backend cada semana</div></div>
-      <div class="branch-item"><div class="bi-dot" style="background:var(--relax)"></div><div class="bi-name">ivan/splash-screen</div><div class="bi-desc">Ramas de Ivan para cada pantalla o feature UI · ej: ivan/player-screen</div></div>
-      <div class="branch-item"><div class="bi-dot" style="background:var(--stoic)"></div><div class="bi-name">isaac/cloud-functions</div><div class="bi-desc">Ramas de Isaac para servicios Firebase · ej: isaac/revenuecat-setup</div></div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════
-     TAB 4 — 12 SEMANAS
-══════════════════════════════════ -->
-<div class="tab-panel" id="tab-semanas">
-  <div class="sec-title">Plan de 12 Semanas</div>
-  <div class="sec-sub">Tareas específicas por semana · Ivan y Isaac en paralelo · toca una tarea para marcarla</div>
-  <div id="semanasWrap">
-    <!-- generated by JS -->
-  </div>
-</div>
-
-</div><!-- /wrap -->
-
-<div class="toast" id="toast"></div>
-
-<script>
-const KEY = 'beliora_org_v1';
-
-/* ── DATA ─────────────────────────────────────────────────── */
-const MODULES = [
-  { title:'📱 lib/screens/', owner:'Ivan', col:'relax', files:[
-    {n:'splash_screen.dart',     d:'Fondo mercury canvas animado, frases random, timer 3s'},
-    {n:'login_screen.dart',      d:'Form Email/Pass, Google, Facebook, botón Login blanco'},
-    {n:'home_screen.dart',       d:'Switch 3 modos, campo IA, grilla sesiones, mini player'},
-    {n:'player_screen.dart',     d:'Album art, progreso, controles, timer, AI✦, compartir'},
-    {n:'settings_screen.dart',   d:'Avatar, nombre, 6 filas de ajustes con chevron'},
-  ]},
-  { title:'🧩 lib/widgets/', owner:'Ivan', col:'relax', files:[
-    {n:'mode_switch.dart',       d:'Pill deslizable · cambia color de toda la UI'},
-    {n:'session_card.dart',      d:'Card thumbnail fluid · label Sn · tap → Player'},
-    {n:'mini_player.dart',       d:'Barra inferior fija · thumbnail · play/pause'},
-    {n:'loading_dots.dart',      d:'3 puntos animados reutilizables'},
-    {n:'mode_background.dart',   d:'Fondo mercury que reacciona al modo activo'},
-  ]},
-  { title:'🗂 lib/state/', owner:'Ivan', col:'relax', files:[
-    {n:'app_state.dart',         d:'Estado global: modo, usuario, sesión activa'},
-    {n:'router.dart',            d:'/splash → /login → /home → /player → /settings'},
-    {n:'theme.dart',             d:'ThemeData · Syne + DM Sans · colores por modo'},
-  ]},
-  { title:'🔐 Firebase Auth', owner:'Isaac', col:'stoic', files:[
-    {n:'auth_service.dart',      d:'signInEmail/Google/Facebook, signOut, getUser'},
-    {n:'google-services.json',   d:'Config Android · SHA-1 registrado'},
-    {n:'GoogleService-Info.plist',d:'Config iOS · Firebase project vinculado'},
-    {n:'Facebook App config',    d:'App ID + Secret · OAuth Redirect URI'},
-  ]},
-  { title:'🗄 Firestore', owner:'Isaac', col:'stoic', files:[
-    {n:'firestore_service.dart', d:'getUser, saveSession, getSessions, updatePlan'},
-    {n:'/users/{uid}',           d:'{ uid, name, email, plan, sessions[], createdAt }'},
-    {n:'/sessions/{id}',         d:'{ id, userId, mode, duration, audioUrl, title }'},
-    {n:'security_rules.rules',   d:'Solo uid propietario puede leer/escribir sus datos'},
-  ]},
-  { title:'⚡ Cloud Functions', owner:'Isaac', col:'stoic', files:[
-    {n:'generateSession.js',     d:'{text,mode,name,duration} → Claude API → script'},
-    {n:'generateAudio.js',       d:'Script → ElevenLabs TTS → MP3 a Storage → URL'},
-    {n:'mixAudio.js',            d:'Voz 80% + ambient 30% → archivo final en Storage'},
-    {n:'deleteUserData.js',      d:'Trigger delete → limpia Firestore + Storage'},
-  ]},
-  { title:'🎵 Audio & Storage', owner:'Isaac', col:'stoic', files:[
-    {n:'audio_service.dart',     d:'play, pause, resume, seek, setTimer, stop'},
-    {n:'/audios/{uid}/{id}.mp3', d:'Sesiones generadas por usuario en Storage'},
-    {n:'music/relax.mp3',        d:'Track ambient Relax · ~5 min · CC0'},
-    {n:'music/motivate.mp3',     d:'Track ambient Motivate · ~5 min · CC0'},
-    {n:'music/stoic.mp3',        d:'Track ambient Stoic · ~5 min · CC0'},
-  ]},
-  { title:'🤝 Compartido', owner:'Ambos', col:'motive', files:[
-    {n:'user_model.dart',        d:'Clase User · campos acordados por ambos'},
-    {n:'session_model.dart',     d:'Estructura sesión · firmada antes de implementar'},
-    {n:'api_contracts.md',       d:'Qué recibe y retorna cada Cloud Function'},
-    {n:'error_codes.dart',       d:'Enum errores: noInternet, authFailed, etc.'},
-    {n:'constants.dart',         d:'Duraciones, modos, versión, base URLs'},
-  ]},
-];
-
-const FLOW_STEPS = [
-  {n:'1', title:'Usuario escribe en Home',         owner:'Ivan',  col:'relax',  desc:'Campo de texto en HomeScreen. Ivan construye el widget ai_input que captura el texto y dispara la acción.', tech:'Flutter · TextField widget'},
-  {n:'2', title:'App llama ai_service.dart',        owner:'Ivan',  col:'relax',  desc:'Ivan llama al servicio que Isaac expone. Aquí está el contrato: ai_service.generateSession(text, mode, name, duration).', tech:'Dart · HTTP call to Cloud Function'},
-  {n:'3', title:'Cloud Function generateSession()', owner:'Isaac', col:'stoic',  desc:'Isaac recibe la petición en el servidor. Valida los parámetros y construye el prompt para Claude API según el modo activo.', tech:'Node.js · Firebase Cloud Functions'},
-  {n:'4', title:'Claude API genera el guion',       owner:'Isaac', col:'stoic',  desc:'Isaac llama a la Anthropic API con el prompt diseñado. Recibe un guion de 300-1200 palabras personalizado con el nombre del usuario.', tech:'Anthropic API · claude-3-5-sonnet'},
-  {n:'5', title:'Cloud Function generateAudio()',   owner:'Isaac', col:'stoic',  desc:'Con el guion listo, Isaac llama a ElevenLabs TTS. Elige la voz según preferencia del usuario (masculina, femenina, neutra).', tech:'Node.js · Cloud Function chaining'},
-  {n:'6', title:'ElevenLabs genera el MP3 de voz',  owner:'Isaac', col:'stoic',  desc:'ElevenLabs convierte el guion a audio MP3 de alta calidad. Isaac recibe el archivo binario de vuelta.', tech:'ElevenLabs TTS API · MP3 output'},
-  {n:'7', title:'mixAudio() · voz + música ambient',owner:'Isaac', col:'stoic',  desc:'Isaac mezcla la voz (80% volumen) con el track ambient del modo seleccionado (30%). Sube el MP3 final a Firebase Storage.', tech:'Node.js audio mix · Storage upload'},
-  {n:'8', title:'URL del audio retorna a Flutter',  owner:'Ambos', col:'motive', desc:'Isaac guarda la sesión en Firestore y retorna la URL del MP3 a Ivan. Punto de coordinación: estructura del response acordada.', tech:'Firestore save · URL response JSON'},
-  {n:'9', title:'Player abre y reproduce',          owner:'Ivan',  col:'relax',  desc:'Ivan recibe la URL, navega al PlayerScreen, carga la sesión y reproduce el audio. El usuario escucha su sesión personalizada.', tech:'Flutter · audio_player package'},
-];
-
-const WEEKS = [
-  {w:'S1', title:'Setup Inicial', phase:'setup', phaseCol:'relax',
-   ivan:['Instalar Flutter SDK, VS Code, extensiones Dart/Flutter','Crear proyecto: flutter create beliora','Configurar estructura de carpetas lib/screens/ lib/widgets/','Importar fuentes Syne + DM Sans al pubspec.yaml','Commit inicial a GitHub, agregar a Isaac como collaborator'],
-   isaac:['Crear proyecto Firebase: beliora-app','Activar Firestore, Storage y Authentication','Conectar Firebase al proyecto Flutter (flutterfire configure)','Definir estructura inicial colección users/ en Firestore','Configurar reglas de seguridad básicas']},
-  {w:'S2', title:'Configuración Base', phase:'setup', phaseCol:'relax',
-   ivan:['Crear ThemeData: colores #6B7FFF / #A259FF / #E03A3A','Crear constants.dart con paleta y duraciones','Implementar router.dart con rutas nombradas','Configurar Provider o Riverpod para AppState'],
-   isaac:['Activar Firebase Auth · Email/Password','Configurar Google Sign-In (SHA-1 Android + iOS)','Crear auth_service.dart con métodos signIn/signOut','Probar login funcional en emulador Flutter']},
-  {w:'S3', title:'Splash + Login', phase:'setup', phaseCol:'relax',
-   ivan:['Construir SplashScreen: canvas mercury animado','Logo placeholder centrado + nombre BELIORA','Pool de 20 frases random (ES + EN) en constants.dart','Construir LoginScreen: campos, botón blanco, botones sociales'],
-   isaac:['Activar Facebook Login en developers.facebook.com','App ID + Secret conectados a Firebase Auth','Guardar user en Firestore al registrarse por primera vez','Probar los 3 métodos login en dispositivo real']},
-  {w:'S4', title:'Home Screen', phase:'build', phaseCol:'motive',
-   ivan:['Construir HomeScreen completo con 3 secciones','Implementar ModeSwitch: pill deslizable + cambio de color UI','Crear SessionCard widget con thumbnail y label Sn','MiniPlayer fijo en bottom + NavBar con 3 íconos'],
-   isaac:['Crear firestore_service.dart: getSessions(), saveSession()','Poblar Firestore con 4-6 sesiones de prueba para la grilla','Definir session_model.dart en conjunto con Ivan','Conectar grilla de Home a Firestore real']},
-  {w:'S5', title:'Player Screen', phase:'build', phaseCol:'motive',
-   ivan:['Construir PlayerScreen: album art, barra de progreso','Controles ⏮ ▶/⏸ ⏭ conectados a audio_service','Botón timer ⏱ con opciones 5/15/30/60 min','Botón ∨ minimizar → regresa a Home con mini player activo'],
-   isaac:['Integrar audio_player package en Flutter','Crear audio_service.dart: play/pause/seek/stop/timer','Subir 3 tracks ambient CC0 a Firebase Storage','Probar reproducción en dispositivo real iOS y Android']},
-  {w:'S6', title:'Settings + Perfil', phase:'build', phaseCol:'motive',
-   ivan:['Construir SettingsScreen: avatar, nombre, 6 filas chevron','Sub-pantalla Account: cambiar nombre y foto','Implementar lógica de cerrar sesión','Pantalla About: versión, links legales'],
-   isaac:['Endpoint updateUser() en firestore_service','Subida de foto de perfil a Firebase Storage','Cloud Function deleteUserData() on account delete','Implementar lógica de eliminación de cuenta completa']},
-  {w:'S7', title:'Animaciones', phase:'build', phaseCol:'motive',
-   ivan:['Animaciones entrada en SplashScreen (fadeUp, mercury)','Hero transitions entre Home y Player','Animación ModeSwitch al deslizar (color interpolation)','Loading dots animados durante generación IA'],
-   isaac:['Optimizar reglas Firestore para producción','Configurar Firebase App Check (anti-abuse)','Testing de performance en Cloud Functions (cold start)','Configurar alertas de cuota y presupuesto Firebase']},
-  {w:'S8', title:'Integración IA', phase:'ia', phaseCol:'stoic',
-   ivan:['Crear ai_input_widget: textarea → enviar → loading state','Conectar HomeScreen al ai_service que Isaac provee','Loading dots durante generación (~5-10 seg)','Al recibir URL del audio → navegar a PlayerScreen auto'],
-   isaac:['Cloud Function generateSession() con Claude API','Prompt engineering por modo: Relax / Motivate / Stoic','Personalización con nombre usuario y duración elegida','Sistema de fallback si Claude API falla o tarda']},
-  {w:'S9', title:'Audio IA', phase:'ia', phaseCol:'stoic',
-   ivan:['Mostrar título y descripción generados por IA en Player','Persistir sesión generada en historial del usuario','UI para las 3 voces: masculina, femenina, neutra','Indicador de "Generando sesión…" con progreso estimado'],
-   isaac:['Cloud Function generateAudio() con ElevenLabs TTS','Cloud Function mixAudio(): voz 80% + ambient 30%','Guardar MP3 final en Storage · URL en Firestore','Optimizar tiempo de generación · meta: < 15 segundos']},
-  {w:'S10', title:'Premium + Pagos', phase:'ia', phaseCol:'stoic',
-   ivan:['Integrar RevenueCat SDK en Flutter','Pantalla Paywall: Free vs Premium con features','Bloquear sesiones 4+ y modos Relax/Stoic en Free','Mostrar badge plan en Settings · botón Upgrade'],
-   isaac:['Configurar productos App Store Connect y Google Play','Configurar entitlements y offerings en RevenueCat','revenuecat_service: purchase(), restore(), check()','Testing de compra en sandbox iOS y Android']},
-  {w:'S11', title:'QA + Store Assets', phase:'launch', phaseCol:'teal',
-   ivan:['Testing completo de todas las pantallas en dispositivos reales','Corregir bugs UI: overflow, padding, dark mode edge cases','Screenshots App Store: 1290×2796px (iPhone 6.7")','Screenshots Google Play: 1080×1920px mínimo'],
-   isaac:['Testing todos los Cloud Functions en producción','Revisar reglas Firestore y Storage para producción real','Crear Política de Privacidad en termsfeed.com (gratis)','Configurar cuentas developer: Apple $99/año · Google $25']},
-  {w:'S12', title:'🚀 Lanzamiento', phase:'launch', phaseCol:'teal',
-   ivan:['flutter build ipa (iOS) + flutter build appbundle (Android)','Metadata App Store: descripción, keywords, categoría','Metadata Google Play: igual que App Store en ES + EN','Subir build y pasar review Apple (1-3 días típico)'],
-   isaac:['Firebase en modo producción (no sandbox ni test)','Activar Google Analytics + Firebase Crashlytics','Monitorear primeros usuarios: Auth, Firestore, Functions','Revisar costos reales vs presupuesto $45/mes target']},
-];
-
-/* ── STATE ──────────────────────────────────────────────────── */
-function loadState(){ try{return JSON.parse(localStorage.getItem(KEY))||{};}catch{return{};} }
-function saveState(s){ try{localStorage.setItem(KEY,JSON.stringify(s));}catch{} }
-
-/* ── TOAST ──────────────────────────────────────────────────── */
-let toastT;
-function showToast(msg){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.classList.add('show');
-  clearTimeout(toastT);
-  toastT=setTimeout(()=>el.classList.remove('show'),2800);
-}
-
-/* ── TABS ───────────────────────────────────────────────────── */
-function switchTab(name){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  document.querySelector(`[data-tab="${name}"]`).classList.add('active');
-}
-
-/* ── EQUIPO TAB: toggle file checkbox ───────────────────────── */
-function toggleFile(el, owner){
-  const state=loadState();
-  const name=el.querySelector('.fi-name').textContent;
-  const k=`file_${owner}_${name}`;
-  state[k]=!state[k];
-  saveState(state);
-  applyFileState(el, state[k], owner);
-  updateMaster();
-  if(state[k]) showToast('✅ Archivo marcado');
-}
-function applyFileState(el, done, owner){
-  el.classList.toggle('done', done);
-  const ch=el.querySelector('.fi-check');
-  ch.classList.toggle('checked', done);
-  ch.textContent=done?'✓':'';
-}
-
-/* ── MODULES TAB ────────────────────────────────────────────── */
-function buildModules(){
-  const wrap=document.getElementById('modulesLayout');
-  const state=loadState();
-  wrap.innerHTML='';
-  MODULES.forEach((mod,mi)=>{
-    const col = mod.col==='relax'?'var(--relax)':mod.col==='stoic'?'var(--stoic)':mod.col==='motive'?'var(--motive)':'var(--teal)';
-    const done=mod.files.filter(f=>state[`mod_${mi}_${f.n}`]).length;
-    const pct=mod.files.length?Math.round(done/mod.files.length*100):0;
-    const div=document.createElement('div');
-    div.className='mod-card';
-    div.innerHTML=`
-      <div class="mod-header" onclick="toggleMod(this.parentElement)">
-        <div class="mh-left">
-          <div class="mh-icon" style="background:${col}22;">${mod.owner==='Ivan'?'🔵':mod.owner==='Isaac'?'🔴':'🟣'}</div>
-          <div>
-            <div class="mh-title">${mod.title}</div>
-            <div class="mh-owner">${mod.owner}</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="mh-progress" style="background:${col}22;color:${col}">${done}/${mod.files.length}</div>
-          <div class="mh-toggle">+</div>
-        </div>
-      </div>
-      <div class="mod-body">
-        <div class="mod-bar-wrap"><div class="mod-bar" style="width:${pct}%;background:${col}" data-mi="${mi}"></div></div>
-        ${mod.files.map(f=>{
-          const k=`mod_${mi}_${f.n}`;
-          const isDone=!!state[k];
-          return `<div class="mod-file${isDone?' done':''}" onclick="toggleModFile(this,${mi},'${f.n.replace(/'/g,"\\'")}','${col}')">
-            <div class="mf-check" style="${isDone?`background:${col};border-color:${col};color:#09090f`:''}">${isDone?'✓':''}</div>
-            <div>
-              <div class="mf-name" style="color:${isDone?'var(--muted)':'var(--text)'}">${f.n}</div>
-              <div class="mf-desc">${f.d}</div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>`;
-    wrap.appendChild(div);
-  });
-}
-
-function toggleMod(card){
-  card.classList.toggle('open');
-}
-
-function toggleModFile(el, mi, fname, col){
-  const state=loadState();
-  const k=`mod_${mi}_${fname}`;
-  state[k]=!state[k];
-  saveState(state);
-  const isDone=state[k];
-  el.classList.toggle('done',isDone);
-  const ch=el.querySelector('.mf-check');
-  ch.style.background=isDone?col:'';
-  ch.style.borderColor=isDone?col:'';
-  ch.style.color=isDone?'#09090f':'';
-  ch.textContent=isDone?'✓':'';
-  el.querySelector('.mf-name').style.color=isDone?'var(--muted)':'var(--text)';
-  // update bar
-  const mod=MODULES[mi];
-  const done=mod.files.filter(f=>state[`mod_${mi}_${f.n}`]).length;
-  const pct=Math.round(done/mod.files.length*100);
-  const bar=document.querySelector(`.mod-bar[data-mi="${mi}"]`);
-  if(bar) bar.style.width=pct+'%';
-  // update count
-  const card=el.closest('.mod-card');
-  const prog=card.querySelector('.mh-progress');
-  if(prog) prog.textContent=`${done}/${mod.files.length}`;
-  updateMaster();
-  if(isDone) showToast('✅ Completado');
-}
-
-/* ── FLOW TAB ────────────────────────────────────────────────── */
-function buildFlow(){
-  const wrap=document.getElementById('flowSteps');
-  wrap.innerHTML='';
-  FLOW_STEPS.forEach(s=>{
-    const col=s.col==='relax'?'var(--relax)':s.col==='stoic'?'var(--stoic)':'var(--motive)';
-    const ownerTag=s.owner==='Ivan'?`<span style="background:rgba(107,127,255,.15);color:var(--relax);border-radius:6px;padding:2px 9px;font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;">Ivan</span>`:
-                  s.owner==='Isaac'?`<span style="background:rgba(224,58,58,.15);color:var(--stoic);border-radius:6px;padding:2px 9px;font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;">Isaac</span>`:
-                  `<span style="background:rgba(162,89,255,.15);color:var(--motive);border-radius:6px;padding:2px 9px;font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;">Ambos</span>`;
-    wrap.innerHTML+=`
-      <div class="flow-step">
-        <div class="fs-left">
-          <div class="fs-num" style="background:${col}22;color:${col};border:1.5px solid ${col}55">${s.n}</div>
-          <div class="fs-line" style="background:${col}30"></div>
-        </div>
-        <div class="fs-content">
-          <div class="fs-card">
-            <div class="fc-top">
-              <div class="fc-title">${s.title}</div>
-              ${ownerTag}
-            </div>
-            <div class="fc-desc">${s.desc}</div>
-            <div class="fc-tech">⚙ ${s.tech}</div>
-          </div>
-        </div>
-      </div>`;
-  });
-}
-
-/* ── SEMANAS TAB ─────────────────────────────────────────────── */
-function buildSemanas(){
-  const wrap=document.getElementById('semanasWrap');
-  const state=loadState();
-  wrap.innerHTML='';
-
-  const phases=[
-    {id:'setup',  label:'SETUP · Semanas 1–3',   col:'var(--relax)',  range:[0,1,2]},
-    {id:'build',  label:'CONSTRUCCIÓN · S4–7',    col:'var(--motive)', range:[3,4,5,6]},
-    {id:'ia',     label:'IA + AUDIO · S8–10',     col:'var(--stoic)',  range:[7,8,9]},
-    {id:'launch', label:'LANZAMIENTO · S11–12',   col:'var(--teal)',   range:[10,11]},
-  ];
-
-  phases.forEach(ph=>{
-    const sec=document.createElement('div');
-    sec.className='phase-section';
-
-    const phDiv=document.createElement('div');
-    phDiv.className='phase-header';
-    phDiv.style.background=`${ph.col}10`;
-    phDiv.innerHTML=`<div class="ph-label" style="background:${ph.col}20;color:${ph.col}">${ph.label}</div>`;
-    sec.appendChild(phDiv);
-
-    const grid=document.createElement('div');
-    grid.className='weeks-grid';
-
-    ph.range.forEach(wi=>{
-      const wk=WEEKS[wi];
-      const allTasks=[...wk.ivan,...wk.isaac];
-      const doneN=allTasks.filter((_,ti)=>state[`wk_${wi}_${ti}`]).length;
-      const pct=allTasks.length?Math.round(doneN/allTasks.length*100):0;
-      const allDone=doneN===allTasks.length;
-      const col=`var(--${wk.phaseCol})`;
-
-      const card=document.createElement('div');
-      card.className='week-card'+(allDone?' all-done':'');
-      card.innerHTML=`
-        <div class="wc-header" onclick="toggleWeek(this.parentElement)">
-          <div class="wc-num" style="background:${col}18;border:1px solid ${col}40">
-            <div class="wn-s" style="color:${col}">SEM</div>
-            <div class="wn-n" style="color:${col}">${wi+1}</div>
-          </div>
-          <div class="wc-info">
-            <div class="wc-title">${wk.title}</div>
-            <div class="wc-sub">${doneN} / ${allTasks.length} tareas completadas</div>
-          </div>
-          <div class="wc-right">
-            <div class="wc-pct" id="wkpct-${wi}">${pct}%</div>
-            <div class="wc-tog">+</div>
-          </div>
-        </div>
-        <div class="wc-body">
-          <div class="wc-mini-bar"><div class="wcmb-fill" id="wkmb-${wi}" style="width:${pct}%;background:${col}"></div></div>
-          <div class="owner-section">
-            <div class="os-label" style="background:rgba(107,127,255,.12);color:var(--relax)">👤 Ivan</div>
-            ${wk.ivan.map((t,ti)=>{
-              const k=`wk_${wi}_${ti}`;
-              const d=!!state[k];
-              return `<div class="week-task${d?' done':''}" onclick="toggleWeekTask(this,${wi},${ti},'ivan')">
-                <div class="wt-check" style="${d?`background:var(--relax);border-color:var(--relax);color:#09090f`:''}">${d?'✓':''}</div>
-                <div class="wt-text">${t}</div>
-              </div>`;
-            }).join('')}
-          </div>
-          <div class="owner-section" style="margin-top:12px;">
-            <div class="os-label" style="background:rgba(224,58,58,.12);color:var(--stoic)">👤 Isaac</div>
-            ${wk.isaac.map((t,ti)=>{
-              const globalTi=wk.ivan.length+ti;
-              const k=`wk_${wi}_${globalTi}`;
-              const d=!!state[k];
-              return `<div class="week-task${d?' done':''}" onclick="toggleWeekTask(this,${wi},${globalTi},'isaac')">
-                <div class="wt-check" style="${d?`background:var(--stoic);border-color:var(--stoic);color:#09090f`:''}">${d?'✓':''}</div>
-                <div class="wt-text">${t}</div>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>
-        `;
-      grid.appendChild(card);
+    // 📥 Cargar progreso guardado (TIEMPO REAL)
+    onSnapshot(progresoRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+          const id = checkbox.id;
+          if (data[id] === true) {
+            checkbox.checked = true;
+            checkbox.closest('.task-item')?.classList.add('completed');
+          }
+        });
+        actualizarContador();
+      }
     });
-    sec.appendChild(grid);
-    wrap.appendChild(sec);
-  });
-}
 
-function toggleWeek(card){
-  card.classList.toggle('open');
-}
+    // 💾 Guardar cuando se marque/desmarque
+    document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+      // Cargar estado inicial si ya existe en localStorage (fallback)
+      const guardado = localStorage.getItem(checkbox.id);
+      if (guardado === 'true' && !checkbox.checked) {
+        checkbox.checked = true;
+        checkbox.closest('.task-item')?.classList.add('completed');
+      }
 
-function toggleWeekTask(el, wi, ti, owner){
-  const state=loadState();
-  const k=`wk_${wi}_${ti}`;
-  state[k]=!state[k];
-  saveState(state);
-  const d=state[k];
-  el.classList.toggle('done',d);
-  const ch=el.querySelector('.wt-check');
-  const col=owner==='ivan'?'var(--relax)':'var(--stoic)';
-  ch.style.background=d?col:'';
-  ch.style.borderColor=d?col:'';
-  ch.style.color=d?'#09090f':'';
-  ch.textContent=d?'✓':'';
+      checkbox.addEventListener('change', async function() {
+        const id = this.id;
+        const completado = this.checked;
+        
+        // Actualizar UI local
+        if (completado) {
+          this.closest('.task-item')?.classList.add('completed');
+        } else {
+          this.closest('.task-item')?.classList.remove('completed');
+        }
+        
+        // Guardar en localStorage (backup inmediato)
+        localStorage.setItem(id, completado);
+        
+        // Guardar en Firestore (sincronización en tiempo real)
+        try {
+          await updateDoc(progresoRef, { [id]: completado });
+        } catch (error) {
+          // Si el documento no existe, lo crea con todos los valores actuales
+          const todasLasTareas = {};
+          document.querySelectorAll('.task-checkbox').forEach(cb => {
+            todasLasTareas[cb.id] = cb.checked;
+          });
+          await setDoc(progresoRef, todasLasTareas);
+        }
+        
+        actualizarContador();
+      });
+    });
 
-  // update week bar + pct
-  const wk=WEEKS[wi];
-  const allTasks=[...wk.ivan,...wk.isaac];
-  const doneN=allTasks.filter((_,t)=>state[`wk_${wi}_${t}`]).length;
-  const pct=Math.round(doneN/allTasks.length*100);
-  const mb=document.getElementById(`wkmb-${wi}`);
-  const pc=document.getElementById(`wkpct-${wi}`);
-  if(mb) mb.style.width=pct+'%';
-  if(pc) pc.textContent=pct+'%';
-  const card=el.closest('.week-card');
-  const sub=card.querySelector('.wc-sub');
-  if(sub) sub.textContent=`${doneN} / ${allTasks.length} tareas completadas`;
-  card.classList.toggle('all-done', doneN===allTasks.length);
-  updateMaster();
-  if(d) showToast(doneN===allTasks.length?'🎉 ¡Semana completada!':'✅ Tarea completada');
-}
+    // 🔄 Actualizar contador de progreso
+    function actualizarContador() {
+      const checkboxes = document.querySelectorAll('.task-checkbox');
+      const total = checkboxes.length;
+      const completadas = document.querySelectorAll('.task-checkbox:checked').length;
+      const el = document.querySelector('.progreso-texto');
+      if (el) {
+        el.textContent = `${completadas} / ${total} tareas`;
+      }
+    }
 
-/* ── MASTER PROGRESS ─────────────────────────────────────────── */
-function updateMaster(){
-  const state=loadState();
-  let total=0, done=0;
-  // count week tasks
-  WEEKS.forEach((wk,wi)=>{
-    const all=[...wk.ivan,...wk.isaac];
-    all.forEach((_,ti)=>{ total++; if(state[`wk_${wi}_${ti}`]) done++; });
-  });
-  const pct=total?Math.round(done/total*100):0;
-  document.getElementById('masterFill').style.width=pct+'%';
-  document.getElementById('masterPct').textContent=`${done} / ${total} tareas`;
-}
+    // 🗑️ Botón Reiniciar
+    document.getElementById('btnReiniciar')?.addEventListener('click', async () => {
+      if (confirm('¿Reiniciar TODO el progreso? Esto afectará a Ivan e Isaac.')) {
+        document.querySelectorAll('.task-checkbox').forEach(cb => {
+          cb.checked = false;
+          cb.closest('.task-item')?.classList.remove('completed');
+          localStorage.removeItem(cb.id);
+        });
+        await setDoc(progresoRef, {});
+        actualizarContador();
+      }
+    });
 
-/* ── RESET ───────────────────────────────────────────────────── */
-function resetAll(){
-  if(!confirm('¿Reiniciar todo el progreso? No se puede deshacer.')) return;
-  localStorage.removeItem(KEY);
-  buildModules();
-  buildSemanas();
-  updateMaster();
-  // reset equipo checkboxes
-  document.querySelectorAll('.fi-check').forEach(ch=>{
-    ch.classList.remove('checked'); ch.textContent='';
-  });
-  document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('done'));
-  showToast('↺ Progreso reiniciado');
-}
-
-/* ── INIT ────────────────────────────────────────────────────── */
-buildModules();
-buildFlow();
-buildSemanas();
-updateMaster();
-
-// restore equipo tab checkboxes
-(function(){
-  const state=loadState();
-  document.querySelectorAll('.file-item').forEach(el=>{
-    const name=el.querySelector('.fi-name')?.textContent;
-    const owner=el.closest('.person-card')?.classList.contains('ivan')?'ivan':'isaac';
-    const k=`file_${owner}_${name}`;
-    if(state[k]) applyFileState(el,true,owner);
-  });
-})();
-</script>
+    // Inicializar contador al cargar
+    document.addEventListener('DOMContentLoaded', actualizarContador);
+  </script>
 </body>
 </html>
