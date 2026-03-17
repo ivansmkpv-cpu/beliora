@@ -900,7 +900,7 @@ function subscribeFirebase() {
       const who   = data.lastUser || '';
       const ts    = data.lastUpdated || 0;
       if (!isSyncing) {
-        saveLocal(state);
+        try{ localStorage.setItem('beliora_org_v1', JSON.stringify(state)); }catch{}
         applyFullState(state);
         updateMaster();
         if (who && who !== currentUser) setSyncStatus('update', who, ts);
@@ -919,7 +919,7 @@ function loadFromFirebase() {
       if (snap.exists) {
         const state = snap.data().state || {};
         if (Object.keys(state).length > 0) {
-          saveLocal(state);
+          try{ localStorage.setItem('beliora_org_v1', JSON.stringify(state)); }catch{}
           applyFullState(state);
           updateMaster();
         }
