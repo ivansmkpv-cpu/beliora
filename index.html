@@ -456,6 +456,97 @@ header p{color:var(--muted);font-size:.9rem;max-width:500px;margin:0 auto 24px;}
 </head>
 <body>
 
+<!-- ══ PASSWORD GATE ══════════════════════════════════════════ -->
+<div id="gate" style="
+  position:fixed;inset:0;z-index:99999;
+  background:#09090f;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Sans',sans-serif;
+">
+  <!-- ambient -->
+  <div style="position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 50% 40% at 20% 30%,rgba(107,127,255,.07),transparent 70%),
+               radial-gradient(ellipse 40% 35% at 80% 70%,rgba(162,89,255,.06),transparent 70%);"></div>
+
+  <div style="position:relative;width:100%;max-width:420px;padding:20px;">
+
+    <!-- Logo + title -->
+    <div style="text-align:center;margin-bottom:36px;">
+      <div style="
+        width:64px;height:64px;border-radius:18px;margin:0 auto 16px;
+        background:rgba(107,127,255,.1);border:1.5px solid rgba(107,127,255,.3);
+        display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+      ">🔐</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:#eaeaf5;">
+        <span style="background:linear-gradient(90deg,#6b7fff,#a259ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Beliora</span> Org
+      </div>
+      <div style="color:#6a6a88;font-size:.85rem;margin-top:6px;">Acceso privado · Solo equipo Beliora</div>
+    </div>
+
+    <!-- Card -->
+    <div style="background:#12121a;border:1px solid #2e2e45;border-radius:20px;padding:28px 28px 24px;">
+
+      <div style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
+        letter-spacing:.14em;text-transform:uppercase;color:#6a6a88;margin-bottom:16px;">
+        🔑 Contraseña de acceso
+      </div>
+
+      <!-- Input -->
+      <div style="position:relative;margin-bottom:14px;">
+        <input
+          id="gateInput"
+          type="password"
+          placeholder="Ingresa tu contraseña..."
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter')checkPass()"
+          style="
+            width:100%;padding:13px 48px 13px 16px;
+            background:#1a1a26;border:1.5px solid #2e2e45;
+            border-radius:12px;color:#eaeaf5;font-family:'DM Sans',sans-serif;
+            font-size:.9rem;outline:none;box-sizing:border-box;
+            transition:border-color .2s;
+          "
+          onfocus="this.style.borderColor='#6b7fff'"
+          onblur="this.style.borderColor='#2e2e45'"
+        >
+        <button onclick="toggleGateVis()" style="
+          position:absolute;right:14px;top:50%;transform:translateY(-50%);
+          background:none;border:none;cursor:pointer;font-size:1rem;color:#6a6a88;
+          transition:color .2s;
+        " title="Mostrar/ocultar">👁</button>
+      </div>
+
+      <!-- Error msg -->
+      <div id="gateError" style="
+        color:#e03a3a;font-size:.75rem;margin-bottom:12px;
+        min-height:18px;transition:opacity .2s;opacity:0;
+      ">Contraseña incorrecta. Intenta de nuevo.</div>
+
+      <!-- Enter button -->
+      <button onclick="checkPass()" style="
+        width:100%;padding:13px;border:none;border-radius:12px;
+        background:linear-gradient(90deg,#6b7fff,#a259ff);
+        color:#fff;font-family:'Syne',sans-serif;font-size:.9rem;
+        font-weight:800;cursor:pointer;letter-spacing:.04em;
+        transition:opacity .2s;
+      " onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        Entrar →
+      </button>
+
+      <!-- Hint -->
+      <div style="text-align:center;margin-top:16px;color:#45455e;font-size:.72rem;line-height:1.6;">
+        Acceso exclusivo para el equipo Beliora<br>
+        <span style="color:#2e2e45;">Ivan · Isaac</span>
+      </div>
+    </div>
+
+    <!-- Attempts counter (hidden) -->
+    <div id="attemptsMsg" style="text-align:center;color:#45455e;font-size:.68rem;margin-top:10px;min-height:16px;"></div>
+  </div>
+</div>
+<!-- ══ END GATE ═════════════════════════════════════════════ -->
+
+
 <div class="wrap">
 
 <!-- HEADER -->
@@ -849,6 +940,86 @@ header p{color:var(--muted);font-size:.9rem;max-width:500px;margin:0 auto 24px;}
 <div class="toast" id="toast"></div>
 
 <script>
+
+
+/* ══ PASSWORD GATE LOGIC ═══════════════════════════════════ */
+const VALID_HASHES = {
+  "84ad3c2543b6f5a92364f2ae8cbf8d7ab0fa823be201ce80c41a4b8c511323c3":   "ivan",
+  "7af6be532b7b8a4557da86e2658e29b09f49a8be19f2d9ec5c1e18fa3a7549ed":  "isaac",
+  "b0f4ced4b33949f26aebc7c5ac1f84d7baafc73486b18e061f5d07442f0ce117": "ivan",
+};
+const GATE_KEY  = 'beliora_gate_v1';
+const MAX_TRIES = 5;
+let   gateAttempts = 0;
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkPass() {
+  if(gateAttempts >= MAX_TRIES) {
+    showGateError('Demasiados intentos. Recarga la página.');
+    return;
+  }
+  const val = document.getElementById('gateInput').value.trim();
+  if(!val) return;
+  const hash = await sha256(val);
+  const who  = VALID_HASHES[hash];
+  if(who) {
+    // Correct password
+    const gate = document.getElementById('gate');
+    gate.style.opacity = '0';
+    gate.style.transition = 'opacity .4s';
+    setTimeout(() => gate.style.display='none', 400);
+    // Store session (expires in 24h)
+    const session = { who, ts: Date.now() };
+    localStorage.setItem(GATE_KEY, JSON.stringify(session));
+    // Auto-set user identity for Firebase
+    if(typeof setUser === 'function') setUser(who);
+  } else {
+    gateAttempts++;
+    showGateError(`Contraseña incorrecta · ${MAX_TRIES - gateAttempts} intentos restantes`);
+    const inp = document.getElementById('gateInput');
+    inp.value = '';
+    inp.style.borderColor = '#e03a3a';
+    setTimeout(()=>inp.style.borderColor='#2e2e45', 1200);
+    if(gateAttempts >= MAX_TRIES) {
+      document.getElementById('gateInput').disabled = true;
+      document.getElementById('attemptsMsg').textContent = '🔒 Bloqueado. Recarga la página para intentar de nuevo.';
+    }
+  }
+}
+
+function showGateError(msg) {
+  const el = document.getElementById('gateError');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  setTimeout(()=>el.style.opacity='0', 3000);
+}
+
+function toggleGateVis() {
+  const inp = document.getElementById('gateInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── Check existing session on load ────────────────────────────
+(function checkGateSession() {
+  try {
+    const raw = localStorage.getItem(GATE_KEY);
+    if(!raw) return; // show gate
+    const session = JSON.parse(raw);
+    const age = Date.now() - (session.ts || 0);
+    const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+    if(age < MAX_AGE && session.who) {
+      // Valid session — hide gate immediately
+      document.getElementById('gate').style.display = 'none';
+      // Will be picked up by beliora_user check below
+      localStorage.setItem('beliora_user', session.who);
+    }
+  } catch(e) {}
+})();
+/* ══ END GATE LOGIC ════════════════════════════════════════ */
 
 // ══════════════════════════════════════════════════════
 //  FIREBASE INIT (compat SDK — global scope)
