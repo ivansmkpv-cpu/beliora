@@ -4,28 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Beliora · Organigrama Interactivo</title>
-<!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-  import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
-  window.__fbReady = false;
-  const firebaseConfig = {
-    apiKey: "AIzaSyDSpASKuuNRurGompHXUfyjysyt1OF0ZKI",
-    authDomain: "orgama-beliora.firebaseapp.com",
-    projectId: "orgama-beliora",
-    storageBucket: "orgama-beliora.firebasestorage.app",
-    messagingSenderId: "1002070343736",
-    appId: "1:1002070343736:web:4ddb91667a8700c12be6cd",
-    measurementId: "G-QM2V43L48G"
-  };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  getAnalytics(app);
-  window.__db = db;
-  window.__fbReady = true;
-  window.dispatchEvent(new Event("fbReady"));
-</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap');
 
@@ -471,6 +449,10 @@ header p{color:var(--muted);font-size:.9rem;max-width:500px;margin:0 auto 24px;}
   .team-grid,.modules-layout,.weeks-grid,.shared-grid{grid-template-columns:1fr;}
 }
 </style>
+<!-- Firebase via compat CDN (works with global JS) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
 </head>
 <body>
 
@@ -493,48 +475,32 @@ header p{color:var(--muted);font-size:.9rem;max-width:500px;margin:0 auto 24px;}
 </header>
 
 <!-- FIREBASE SYNC STATUS BAR -->
-<div id="syncBar" style="
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  background:#12121a;border:1px solid #232333;border-radius:12px;
-  padding:10px 18px;margin-bottom:0;font-size:.75rem;
-  font-family:'Syne',sans-serif;font-weight:700;
-  transition:all .4s;
-">
+<div id="syncBar" style="max-width:700px;margin:14px auto 0;display:flex;align-items:center;gap:10px;background:#12121a;border:1px solid #232333;border-radius:12px;padding:10px 18px;font-size:.75rem;font-family:'Syne',sans-serif;font-weight:700;transition:all .4s;">
   <div id="syncDot" style="width:8px;height:8px;border-radius:50%;background:#45455e;flex-shrink:0;transition:background .4s;"></div>
   <span id="syncMsg" style="color:#6a6a88;">Conectando a Firebase...</span>
   <span id="syncUser" style="margin-left:auto;color:#45455e;font-size:.65rem;font-weight:400;"></span>
 </div>
 
-<!-- WHO AM I selector (first visit) -->
-<div id="whoModal" style="
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;
-  align-items:center;justify-content:center;backdrop-filter:blur(6px);
-">
-  <div style="
-    background:#12121a;border:1px solid #2e2e45;border-radius:22px;
-    padding:36px 40px;text-align:center;max-width:400px;width:90%;
-  ">
-    <div style="font-size:2.5rem;margin-bottom:14px;">👤</div>
-    <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:8px;color:#eaeaf5;">¿Quién eres?</div>
-    <div style="color:#6a6a88;font-size:.85rem;margin-bottom:28px;line-height:1.55;">
-      El progreso se sincronizará en tiempo real con el otro miembro del equipo.
-    </div>
+<!-- WHO AM I modal -->
+<div id="whoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(8px);">
+  <div style="background:#12121a;border:1px solid #2e2e45;border-radius:22px;padding:36px 40px;text-align:center;max-width:400px;width:90%;">
+    <div style="font-size:2.8rem;margin-bottom:14px;">👤</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;margin-bottom:8px;color:#eaeaf5;">¿Quién eres?</div>
+    <div style="color:#6a6a88;font-size:.85rem;margin-bottom:28px;line-height:1.6;">El progreso se sincronizará en tiempo real<br>entre Ivan e Isaac vía Firebase.</div>
     <div style="display:flex;gap:12px;justify-content:center;">
-      <button onclick="setUser('ivan')" style="
-        flex:1;padding:14px;border-radius:12px;border:1.5px solid rgba(107,127,255,.4);
-        background:rgba(107,127,255,.1);color:#6b7fff;
-        font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;
-        transition:all .2s;
-      ">💙 Ivan<br><span style="font-size:.7rem;font-weight:400;opacity:.7">Frontend · Flutter UI</span></button>
-      <button onclick="setUser('isaac')" style="
-        flex:1;padding:14px;border-radius:12px;border:1.5px solid rgba(224,58,58,.4);
-        background:rgba(224,58,58,.1);color:#e03a3a;
-        font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;
-        transition:all .2s;
-      ">❤️ Isaac<br><span style="font-size:.7rem;font-weight:400;opacity:.7">Backend · Firebase</span></button>
+      <button onclick="setUser('ivan')" style="flex:1;padding:16px 12px;border-radius:14px;border:1.5px solid rgba(107,127,255,.45);background:rgba(107,127,255,.1);color:#6b7fff;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;">
+        💙 Ivan<br><span style="font-size:.7rem;font-weight:400;opacity:.65;">Frontend · Flutter UI</span>
+      </button>
+      <button onclick="setUser('isaac')" style="flex:1;padding:16px 12px;border-radius:14px;border:1.5px solid rgba(224,58,58,.45);background:rgba(224,58,58,.1);color:#e03a3a;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;">
+        ❤️ Isaac<br><span style="font-size:.7rem;font-weight:400;opacity:.65;">Backend · Firebase</span>
+      </button>
     </div>
+    <button onclick="setUser('ivan')" style="display:block;width:100%;margin-top:14px;padding:10px;border-radius:10px;border:1px solid #232333;background:transparent;color:#45455e;font-family:'Syne',sans-serif;font-size:.7rem;cursor:pointer;">
+      Continuar sin Firebase (solo local)
+    </button>
   </div>
 </div>
+
 
 <!-- NAV TABS -->
 <div class="nav-tabs">
@@ -885,168 +851,264 @@ header p{color:var(--muted);font-size:.9rem;max-width:500px;margin:0 auto 24px;}
 <script>
 
 // ══════════════════════════════════════════════════════
-//  FIREBASE SYNC ENGINE
+//  FIREBASE INIT (compat SDK — global scope)
 // ══════════════════════════════════════════════════════
-const KEY        = 'beliora_org_v1';
-const FB_DOC     = 'organigrama/progreso';
-let   currentUser = null;   // 'ivan' | 'isaac'
-let   fbUnsubscribe = null; // Firestore listener
-let   isSyncing  = false;   // prevent re-entrant saves
+const firebaseConfig = {
+  apiKey:            "AIzaSyDSpASKuuNRurGompHXUfyjysyt1OF0ZKI",
+  authDomain:        "orgama-beliora.firebaseapp.com",
+  projectId:         "orgama-beliora",
+  storageBucket:     "orgama-beliora.firebasestorage.app",
+  messagingSenderId: "1002070343736",
+  appId:             "1:1002070343736:web:4ddb91667a8700c12be6cd",
+  measurementId:     "G-QM2V43L48G"
+};
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+const db = firebase.firestore();
 
-// ── Local cache (fallback if offline) ─────────────────
-function loadState(){
-  try{ return JSON.parse(localStorage.getItem(KEY))||{}; }catch{ return{}; }
-}
-function saveLocal(s){
-  try{ localStorage.setItem(KEY,JSON.stringify(s)); }catch{}
-}
+// ── Sync state ─────────────────────────────────────────
+let currentUser  = null;
+let fbListening  = false;
+let isSyncing    = false;
 
-// ── Firebase read / write ──────────────────────────────
-async function saveToFirebase(state){
-  if(!window.__db || !window.__fbReady) return;
-  try{
-    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js");
-    await setDoc(doc(window.__db, 'organigrama', 'progreso'), {
-      state: state,
-      lastUpdated: Date.now(),
-      lastUser: currentUser || 'unknown'
-    });
-  }catch(e){ console.warn('Firebase save error:',e); }
-}
-
-async function loadFromFirebase(){
-  if(!window.__db || !window.__fbReady) return null;
-  try{
-    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js");
-    const snap = await getDoc(doc(window.__db, 'organigrama', 'progreso'));
-    if(snap.exists()) return snap.data().state || {};
-    return {};
-  }catch(e){ console.warn('Firebase load error:',e); return null; }
-}
-
-function subscribeFirebase(){
-  if(!window.__db || !window.__fbReady) return;
-  import("https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js").then(({doc, onSnapshot})=>{
-    if(fbUnsubscribe) fbUnsubscribe();
-    fbUnsubscribe = onSnapshot(
-      doc(window.__db, 'organigrama', 'progreso'),
-      (snap)=>{
-        if(!snap.exists()) return;
-        const data  = snap.data();
-        const state = data.state || {};
-        const who   = data.lastUser || '';
-        const ts    = data.lastUpdated || 0;
-
-        // Only apply remote update if it wasn't triggered by us
-        if(!isSyncing){
-          saveLocal(state);
-          applyFullState(state);
-          updateMaster();
-          setSyncStatus('synced', who, ts);
-        }
-      },
-      (err)=>{ console.warn('Firestore listener error:',err); setSyncStatus('offline'); }
-    );
-    setSyncStatus('connected');
+// ── Firebase save ──────────────────────────────────────
+function saveToFirebase(state) {
+  db.collection('organigrama').doc('progreso').set({
+    state:       state,
+    lastUpdated: Date.now(),
+    lastUser:    currentUser || 'unknown'
+  }).then(() => {
+    setSyncStatus('saved');
+    setTimeout(() => setSyncStatus('synced', currentUser), 1400);
+    isSyncing = false;
+  }).catch(e => {
+    console.warn('Firebase save error:', e);
+    setSyncStatus('offline');
+    isSyncing = false;
   });
 }
 
-// ── Combined save ──────────────────────────────────────
-function saveState(s){
-  saveLocal(s);
-  if(window.__fbReady){
-    isSyncing = true;
-    setSyncStatus('saving');
-    saveToFirebase(s).then(()=>{
-      setSyncStatus('saved');
-      setTimeout(()=>setSyncStatus('synced'), 1500);
-      isSyncing = false;
-    }).catch(()=>{ isSyncing=false; });
-  }
+// ── Firebase real-time listener ────────────────────────
+function subscribeFirebase() {
+  if (fbListening) return;
+  fbListening = true;
+  db.collection('organigrama').doc('progreso')
+    .onSnapshot(snap => {
+      if (!snap.exists) return;
+      const data  = snap.data();
+      const state = data.state || {};
+      const who   = data.lastUser || '';
+      const ts    = data.lastUpdated || 0;
+      if (!isSyncing) {
+        saveLocal(state);
+        applyFullState(state);
+        updateMaster();
+        if (who && who !== currentUser) setSyncStatus('update', who, ts);
+        else setSyncStatus('synced', who, ts);
+      }
+    }, err => {
+      console.warn('Firestore listener error:', err);
+      setSyncStatus('offline');
+    });
+}
+
+// ── Load from Firebase once ────────────────────────────
+function loadFromFirebase() {
+  db.collection('organigrama').doc('progreso').get()
+    .then(snap => {
+      if (snap.exists) {
+        const state = snap.data().state || {};
+        if (Object.keys(state).length > 0) {
+          saveLocal(state);
+          applyFullState(state);
+          updateMaster();
+        }
+      }
+      subscribeFirebase();
+      setSyncStatus('connected');
+    })
+    .catch(e => {
+      console.warn('Firebase load error:', e);
+      setSyncStatus('offline');
+      subscribeFirebase();
+    });
 }
 
 // ── Sync status UI ─────────────────────────────────────
-function setSyncStatus(status, who='', ts=0){
+function setSyncStatus(status, who, ts) {
   const dot = document.getElementById('syncDot');
   const msg = document.getElementById('syncMsg');
   const usr = document.getElementById('syncUser');
   const bar = document.getElementById('syncBar');
-  if(!dot||!msg) return;
-
-  const configs = {
-    connecting: { color:'#45455e', text:'Conectando...', bg:'#12121a' },
-    connected:  { color:'#3de8b0', text:'🔗 Conectado a Firebase · Sincronización en tiempo real', bg:'#0d1a15' },
-    saving:     { color:'#f0c040', text:'💾 Guardando...', bg:'#1a1600' },
-    saved:      { color:'#3de8b0', text:'✅ Guardado en Firebase', bg:'#0d1a15' },
-    synced:     { color:'#3de8b0', text:'🔄 Sincronizado', bg:'#0d1a15' },
-    offline:    { color:'#e03a3a', text:'⚠️ Sin conexión — guardado local', bg:'#1a0d0d' },
-    update:     { color:'#a259ff', text:`🔔 Actualizado por ${who}`, bg:'#110d1a' },
+  if (!dot || !msg) return;
+  const cfgs = {
+    connecting: { color:'#45455e', text:'Conectando a Firebase...', bg:'#12121a' },
+    connected:  { color:'#3de8b0', text:'🔗 Firebase conectado · Sincronización en tiempo real', bg:'#0c1a14' },
+    saving:     { color:'#f0c040', text:'💾 Guardando en Firebase...', bg:'#181400' },
+    saved:      { color:'#3de8b0', text:'✅ Guardado en Firebase', bg:'#0c1a14' },
+    synced:     { color:'#3de8b0', text:'🔄 Sincronizado · En vivo', bg:'#0c1a14' },
+    offline:    { color:'#e03a3a', text:'⚠️ Sin conexión — guardado local', bg:'#1a0c0c' },
+    update:     { color:'#a259ff', text:'🔔 El otro miembro actualizó el progreso', bg:'#100c1a' },
   };
-
-  const cfg = configs[status] || configs.connecting;
-  dot.style.background   = cfg.color;
-  msg.style.color        = cfg.color;
-  msg.textContent        = cfg.text;
-  bar.style.background   = cfg.bg;
-  bar.style.borderColor  = cfg.color+'40';
-
-  if(who && status!=='saving' && who!==currentUser){
-    const time = ts ? new Date(ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}) : '';
-    usr.textContent = `Último cambio: ${who} ${time}`;
-    usr.style.color = who==='ivan'?'rgba(107,127,255,.6)':'rgba(224,58,58,.6)';
-    if(status==='synced') msg.textContent = `🔔 ${who} actualizó el progreso · ${time}`;
+  const cfg = cfgs[status] || cfgs.connecting;
+  dot.style.background  = cfg.color;
+  msg.style.color       = cfg.color;
+  msg.textContent       = cfg.text;
+  bar.style.background  = cfg.bg;
+  bar.style.borderColor = cfg.color + '44';
+  if (who && who !== currentUser && ts) {
+    const t = new Date(ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+    usr.textContent = `Último cambio: ${who} ${t}`;
+    usr.style.color = who==='ivan'?'rgba(107,127,255,.7)':'rgba(224,58,58,.7)';
   }
-}
-
-// ── Apply full remote state to all UI elements ─────────
-function applyFullState(state){
-  // Rebuild dynamic sections with new state
-  buildModules();
-  buildSemanas();
-
-  // Restore equipo tab static checkboxes
-  document.querySelectorAll('.file-item').forEach(el=>{
-    const name  = el.querySelector('.fi-name')?.textContent;
-    const owner = el.closest('.person-card')?.classList.contains('ivan')?'ivan':'isaac';
-    const k     = `file_${owner}_${name}`;
-    applyFileState(el, !!state[k], owner);
-  });
 }
 
 // ── User identity ──────────────────────────────────────
-function setUser(who){
+function setUser(who) {
   currentUser = who;
   localStorage.setItem('beliora_user', who);
   document.getElementById('whoModal').style.display = 'none';
-
-  // Update sync bar with user identity
-  const bar = document.getElementById('syncBar');
-  const col  = who==='ivan'?'#6b7fff':'#e03a3a';
-  const icon = who==='ivan'?'💙':'❤️';
-  document.getElementById('syncUser').textContent = `${icon} ${who.charAt(0).toUpperCase()+who.slice(1)}`;
-  document.getElementById('syncUser').style.color  = col;
-
-  // Init Firebase subscription
-  if(window.__fbReady) initFirebase();
-  else window.addEventListener('fbReady', initFirebase, {once:true});
-}
-
-async function initFirebase(){
+  const col  = who === 'ivan' ? '#6b7fff' : '#e03a3a';
+  const icon = who === 'ivan' ? '💙' : '❤️';
+  const usr  = document.getElementById('syncUser');
+  if (usr) { usr.textContent = icon + ' ' + who.charAt(0).toUpperCase() + who.slice(1); usr.style.color = col; }
   setSyncStatus('connecting');
-  // Load initial state from Firebase (merge with local)
-  const fbState = await loadFromFirebase();
-  if(fbState && Object.keys(fbState).length > 0){
-    // Firebase has data → use it as source of truth
-    saveLocal(fbState);
-    applyFullState(fbState);
-    updateMaster();
-  }
-  // Subscribe to real-time updates
-  subscribeFirebase();
-  setSyncStatus('connected');
+  loadFromFirebase();
 }
 
-// ── Toast ──────────────────────────────────────────────
+// ── Apply remote state to all UI ───────────────────────
+function applyFullState(state) {
+  buildModules();
+  buildSemanas();
+  document.querySelectorAll('.file-item').forEach(el => {
+    const name  = el.querySelector('.fi-name')?.textContent;
+    const owner = el.closest('.person-card')?.classList.contains('ivan') ? 'ivan' : 'isaac';
+    applyFileState(el, !!state[`file_${owner}_${name}`], owner);
+  });
+}
+
+
+const KEY = 'beliora_org_v1';
+
+/* ── DATA ─────────────────────────────────────────────────── */
+const MODULES = [
+  { title:'📱 lib/screens/', owner:'Ivan', col:'relax', files:[
+    {n:'splash_screen.dart',     d:'Fondo mercury canvas animado, frases random, timer 3s'},
+    {n:'login_screen.dart',      d:'Form Email/Pass, Google, Facebook, botón Login blanco'},
+    {n:'home_screen.dart',       d:'Switch 3 modos, campo IA, grilla sesiones, mini player'},
+    {n:'player_screen.dart',     d:'Album art, progreso, controles, timer, AI✦, compartir'},
+    {n:'settings_screen.dart',   d:'Avatar, nombre, 6 filas de ajustes con chevron'},
+  ]},
+  { title:'🧩 lib/widgets/', owner:'Ivan', col:'relax', files:[
+    {n:'mode_switch.dart',       d:'Pill deslizable · cambia color de toda la UI'},
+    {n:'session_card.dart',      d:'Card thumbnail fluid · label Sn · tap → Player'},
+    {n:'mini_player.dart',       d:'Barra inferior fija · thumbnail · play/pause'},
+    {n:'loading_dots.dart',      d:'3 puntos animados reutilizables'},
+    {n:'mode_background.dart',   d:'Fondo mercury que reacciona al modo activo'},
+  ]},
+  { title:'🗂 lib/state/', owner:'Ivan', col:'relax', files:[
+    {n:'app_state.dart',         d:'Estado global: modo, usuario, sesión activa'},
+    {n:'router.dart',            d:'/splash → /login → /home → /player → /settings'},
+    {n:'theme.dart',             d:'ThemeData · Syne + DM Sans · colores por modo'},
+  ]},
+  { title:'🔐 Firebase Auth', owner:'Isaac', col:'stoic', files:[
+    {n:'auth_service.dart',      d:'signInEmail/Google/Facebook, signOut, getUser'},
+    {n:'google-services.json',   d:'Config Android · SHA-1 registrado'},
+    {n:'GoogleService-Info.plist',d:'Config iOS · Firebase project vinculado'},
+    {n:'Facebook App config',    d:'App ID + Secret · OAuth Redirect URI'},
+  ]},
+  { title:'🗄 Firestore', owner:'Isaac', col:'stoic', files:[
+    {n:'firestore_service.dart', d:'getUser, saveSession, getSessions, updatePlan'},
+    {n:'/users/{uid}',           d:'{ uid, name, email, plan, sessions[], createdAt }'},
+    {n:'/sessions/{id}',         d:'{ id, userId, mode, duration, audioUrl, title }'},
+    {n:'security_rules.rules',   d:'Solo uid propietario puede leer/escribir sus datos'},
+  ]},
+  { title:'⚡ Cloud Functions', owner:'Isaac', col:'stoic', files:[
+    {n:'generateSession.js',     d:'{text,mode,name,duration} → Claude API → script'},
+    {n:'generateAudio.js',       d:'Script → ElevenLabs TTS → MP3 a Storage → URL'},
+    {n:'mixAudio.js',            d:'Voz 80% + ambient 30% → archivo final en Storage'},
+    {n:'deleteUserData.js',      d:'Trigger delete → limpia Firestore + Storage'},
+  ]},
+  { title:'🎵 Audio & Storage', owner:'Isaac', col:'stoic', files:[
+    {n:'audio_service.dart',     d:'play, pause, resume, seek, setTimer, stop'},
+    {n:'/audios/{uid}/{id}.mp3', d:'Sesiones generadas por usuario en Storage'},
+    {n:'music/relax.mp3',        d:'Track ambient Relax · ~5 min · CC0'},
+    {n:'music/motivate.mp3',     d:'Track ambient Motivate · ~5 min · CC0'},
+    {n:'music/stoic.mp3',        d:'Track ambient Stoic · ~5 min · CC0'},
+  ]},
+  { title:'🤝 Compartido', owner:'Ambos', col:'motive', files:[
+    {n:'user_model.dart',        d:'Clase User · campos acordados por ambos'},
+    {n:'session_model.dart',     d:'Estructura sesión · firmada antes de implementar'},
+    {n:'api_contracts.md',       d:'Qué recibe y retorna cada Cloud Function'},
+    {n:'error_codes.dart',       d:'Enum errores: noInternet, authFailed, etc.'},
+    {n:'constants.dart',         d:'Duraciones, modos, versión, base URLs'},
+  ]},
+];
+
+const FLOW_STEPS = [
+  {n:'1', title:'Usuario escribe en Home',         owner:'Ivan',  col:'relax',  desc:'Campo de texto en HomeScreen. Ivan construye el widget ai_input que captura el texto y dispara la acción.', tech:'Flutter · TextField widget'},
+  {n:'2', title:'App llama ai_service.dart',        owner:'Ivan',  col:'relax',  desc:'Ivan llama al servicio que Isaac expone. Aquí está el contrato: ai_service.generateSession(text, mode, name, duration).', tech:'Dart · HTTP call to Cloud Function'},
+  {n:'3', title:'Cloud Function generateSession()', owner:'Isaac', col:'stoic',  desc:'Isaac recibe la petición en el servidor. Valida los parámetros y construye el prompt para Claude API según el modo activo.', tech:'Node.js · Firebase Cloud Functions'},
+  {n:'4', title:'Claude API genera el guion',       owner:'Isaac', col:'stoic',  desc:'Isaac llama a la Anthropic API con el prompt diseñado. Recibe un guion de 300-1200 palabras personalizado con el nombre del usuario.', tech:'Anthropic API · claude-3-5-sonnet'},
+  {n:'5', title:'Cloud Function generateAudio()',   owner:'Isaac', col:'stoic',  desc:'Con el guion listo, Isaac llama a ElevenLabs TTS. Elige la voz según preferencia del usuario (masculina, femenina, neutra).', tech:'Node.js · Cloud Function chaining'},
+  {n:'6', title:'ElevenLabs genera el MP3 de voz',  owner:'Isaac', col:'stoic',  desc:'ElevenLabs convierte el guion a audio MP3 de alta calidad. Isaac recibe el archivo binario de vuelta.', tech:'ElevenLabs TTS API · MP3 output'},
+  {n:'7', title:'mixAudio() · voz + música ambient',owner:'Isaac', col:'stoic',  desc:'Isaac mezcla la voz (80% volumen) con el track ambient del modo seleccionado (30%). Sube el MP3 final a Firebase Storage.', tech:'Node.js audio mix · Storage upload'},
+  {n:'8', title:'URL del audio retorna a Flutter',  owner:'Ambos', col:'motive', desc:'Isaac guarda la sesión en Firestore y retorna la URL del MP3 a Ivan. Punto de coordinación: estructura del response acordada.', tech:'Firestore save · URL response JSON'},
+  {n:'9', title:'Player abre y reproduce',          owner:'Ivan',  col:'relax',  desc:'Ivan recibe la URL, navega al PlayerScreen, carga la sesión y reproduce el audio. El usuario escucha su sesión personalizada.', tech:'Flutter · audio_player package'},
+];
+
+const WEEKS = [
+  {w:'S1', title:'Setup Inicial', phase:'setup', phaseCol:'relax',
+   ivan:['Instalar Flutter SDK, VS Code, extensiones Dart/Flutter','Crear proyecto: flutter create beliora','Configurar estructura de carpetas lib/screens/ lib/widgets/','Importar fuentes Syne + DM Sans al pubspec.yaml','Commit inicial a GitHub, agregar a Isaac como collaborator'],
+   isaac:['Crear proyecto Firebase: beliora-app','Activar Firestore, Storage y Authentication','Conectar Firebase al proyecto Flutter (flutterfire configure)','Definir estructura inicial colección users/ en Firestore','Configurar reglas de seguridad básicas']},
+  {w:'S2', title:'Configuración Base', phase:'setup', phaseCol:'relax',
+   ivan:['Crear ThemeData: colores #6B7FFF / #A259FF / #E03A3A','Crear constants.dart con paleta y duraciones','Implementar router.dart con rutas nombradas','Configurar Provider o Riverpod para AppState'],
+   isaac:['Activar Firebase Auth · Email/Password','Configurar Google Sign-In (SHA-1 Android + iOS)','Crear auth_service.dart con métodos signIn/signOut','Probar login funcional en emulador Flutter']},
+  {w:'S3', title:'Splash + Login', phase:'setup', phaseCol:'relax',
+   ivan:['Construir SplashScreen: canvas mercury animado','Logo placeholder centrado + nombre BELIORA','Pool de 20 frases random (ES + EN) en constants.dart','Construir LoginScreen: campos, botón blanco, botones sociales'],
+   isaac:['Activar Facebook Login en developers.facebook.com','App ID + Secret conectados a Firebase Auth','Guardar user en Firestore al registrarse por primera vez','Probar los 3 métodos login en dispositivo real']},
+  {w:'S4', title:'Home Screen', phase:'build', phaseCol:'motive',
+   ivan:['Construir HomeScreen completo con 3 secciones','Implementar ModeSwitch: pill deslizable + cambio de color UI','Crear SessionCard widget con thumbnail y label Sn','MiniPlayer fijo en bottom + NavBar con 3 íconos'],
+   isaac:['Crear firestore_service.dart: getSessions(), saveSession()','Poblar Firestore con 4-6 sesiones de prueba para la grilla','Definir session_model.dart en conjunto con Ivan','Conectar grilla de Home a Firestore real']},
+  {w:'S5', title:'Player Screen', phase:'build', phaseCol:'motive',
+   ivan:['Construir PlayerScreen: album art, barra de progreso','Controles ⏮ ▶/⏸ ⏭ conectados a audio_service','Botón timer ⏱ con opciones 5/15/30/60 min','Botón ∨ minimizar → regresa a Home con mini player activo'],
+   isaac:['Integrar audio_player package en Flutter','Crear audio_service.dart: play/pause/seek/stop/timer','Subir 3 tracks ambient CC0 a Firebase Storage','Probar reproducción en dispositivo real iOS y Android']},
+  {w:'S6', title:'Settings + Perfil', phase:'build', phaseCol:'motive',
+   ivan:['Construir SettingsScreen: avatar, nombre, 6 filas chevron','Sub-pantalla Account: cambiar nombre y foto','Implementar lógica de cerrar sesión','Pantalla About: versión, links legales'],
+   isaac:['Endpoint updateUser() en firestore_service','Subida de foto de perfil a Firebase Storage','Cloud Function deleteUserData() on account delete','Implementar lógica de eliminación de cuenta completa']},
+  {w:'S7', title:'Animaciones', phase:'build', phaseCol:'motive',
+   ivan:['Animaciones entrada en SplashScreen (fadeUp, mercury)','Hero transitions entre Home y Player','Animación ModeSwitch al deslizar (color interpolation)','Loading dots animados durante generación IA'],
+   isaac:['Optimizar reglas Firestore para producción','Configurar Firebase App Check (anti-abuse)','Testing de performance en Cloud Functions (cold start)','Configurar alertas de cuota y presupuesto Firebase']},
+  {w:'S8', title:'Integración IA', phase:'ia', phaseCol:'stoic',
+   ivan:['Crear ai_input_widget: textarea → enviar → loading state','Conectar HomeScreen al ai_service que Isaac provee','Loading dots durante generación (~5-10 seg)','Al recibir URL del audio → navegar a PlayerScreen auto'],
+   isaac:['Cloud Function generateSession() con Claude API','Prompt engineering por modo: Relax / Motivate / Stoic','Personalización con nombre usuario y duración elegida','Sistema de fallback si Claude API falla o tarda']},
+  {w:'S9', title:'Audio IA', phase:'ia', phaseCol:'stoic',
+   ivan:['Mostrar título y descripción generados por IA en Player','Persistir sesión generada en historial del usuario','UI para las 3 voces: masculina, femenina, neutra','Indicador de "Generando sesión…" con progreso estimado'],
+   isaac:['Cloud Function generateAudio() con ElevenLabs TTS','Cloud Function mixAudio(): voz 80% + ambient 30%','Guardar MP3 final en Storage · URL en Firestore','Optimizar tiempo de generación · meta: < 15 segundos']},
+  {w:'S10', title:'Premium + Pagos', phase:'ia', phaseCol:'stoic',
+   ivan:['Integrar RevenueCat SDK en Flutter','Pantalla Paywall: Free vs Premium con features','Bloquear sesiones 4+ y modos Relax/Stoic en Free','Mostrar badge plan en Settings · botón Upgrade'],
+   isaac:['Configurar productos App Store Connect y Google Play','Configurar entitlements y offerings en RevenueCat','revenuecat_service: purchase(), restore(), check()','Testing de compra en sandbox iOS y Android']},
+  {w:'S11', title:'QA + Store Assets', phase:'launch', phaseCol:'teal',
+   ivan:['Testing completo de todas las pantallas en dispositivos reales','Corregir bugs UI: overflow, padding, dark mode edge cases','Screenshots App Store: 1290×2796px (iPhone 6.7")','Screenshots Google Play: 1080×1920px mínimo'],
+   isaac:['Testing todos los Cloud Functions en producción','Revisar reglas Firestore y Storage para producción real','Crear Política de Privacidad en termsfeed.com (gratis)','Configurar cuentas developer: Apple $99/año · Google $25']},
+  {w:'S12', title:'🚀 Lanzamiento', phase:'launch', phaseCol:'teal',
+   ivan:['flutter build ipa (iOS) + flutter build appbundle (Android)','Metadata App Store: descripción, keywords, categoría','Metadata Google Play: igual que App Store en ES + EN','Subir build y pasar review Apple (1-3 días típico)'],
+   isaac:['Firebase en modo producción (no sandbox ni test)','Activar Google Analytics + Firebase Crashlytics','Monitorear primeros usuarios: Auth, Firestore, Functions','Revisar costos reales vs presupuesto $45/mes target']},
+];
+
+/* ── STATE ──────────────────────────────────────────────────── */
+function loadState(){ try{return JSON.parse(localStorage.getItem(KEY))||{};}catch{return{};} }
+function saveState(s){
+  try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch{}
+  // Also save to Firebase if connected
+  if(typeof db !== 'undefined' && currentUser){
+    isSyncing = true;
+    setSyncStatus('saving');
+    saveToFirebase(s);
+  }
+}
+
+/* ── TOAST ──────────────────────────────────────────────────── */
 let toastT;
 function showToast(msg){
   const el=document.getElementById('toast');
@@ -1055,7 +1117,7 @@ function showToast(msg){
   toastT=setTimeout(()=>el.classList.remove('show'),2800);
 }
 
-// ── Tabs ───────────────────────────────────────────────
+/* ── TABS ───────────────────────────────────────────────────── */
 function switchTab(name){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1063,7 +1125,7 @@ function switchTab(name){
   document.querySelector(`[data-tab="${name}"]`).classList.add('active');
 }
 
-// ── Equipo tab toggle ──────────────────────────────────
+/* ── EQUIPO TAB: toggle file checkbox ───────────────────────── */
 function toggleFile(el, owner){
   const state=loadState();
   const name=el.querySelector('.fi-name').textContent;
@@ -1081,7 +1143,7 @@ function applyFileState(el, done, owner){
   ch.textContent=done?'✓':'';
 }
 
-// ── Modules tab ────────────────────────────────────────
+/* ── MODULES TAB ────────────────────────────────────────────── */
 function buildModules(){
   const wrap=document.getElementById('modulesLayout');
   const state=loadState();
@@ -1102,7 +1164,7 @@ function buildModules(){
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <div class="mh-progress" style="background:${col}22;color:${col}" data-mi="${mi}-prog">${done}/${mod.files.length}</div>
+          <div class="mh-progress" style="background:${col}22;color:${col}">${done}/${mod.files.length}</div>
           <div class="mh-toggle">+</div>
         </div>
       </div>
@@ -1111,7 +1173,7 @@ function buildModules(){
         ${mod.files.map(f=>{
           const k=`mod_${mi}_${f.n}`;
           const isDone=!!state[k];
-          return `<div class="mod-file${isDone?' done':''}" onclick="toggleModFile(this,${mi},'${f.n.replace(/'/g,"\'")}','${col}')">
+          return `<div class="mod-file${isDone?' done':''}" onclick="toggleModFile(this,${mi},'${f.n.replace(/'/g,"\\'")}','${col}')">
             <div class="mf-check" style="${isDone?`background:${col};border-color:${col};color:#09090f`:''}">${isDone?'✓':''}</div>
             <div>
               <div class="mf-name" style="color:${isDone?'var(--muted)':'var(--text)'}">${f.n}</div>
@@ -1124,7 +1186,9 @@ function buildModules(){
   });
 }
 
-function toggleMod(card){ card.classList.toggle('open'); }
+function toggleMod(card){
+  card.classList.toggle('open');
+}
 
 function toggleModFile(el, mi, fname, col){
   const state=loadState();
@@ -1139,11 +1203,13 @@ function toggleModFile(el, mi, fname, col){
   ch.style.color=isDone?'#09090f':'';
   ch.textContent=isDone?'✓':'';
   el.querySelector('.mf-name').style.color=isDone?'var(--muted)':'var(--text)';
+  // update bar
   const mod=MODULES[mi];
   const done=mod.files.filter(f=>state[`mod_${mi}_${f.n}`]).length;
   const pct=Math.round(done/mod.files.length*100);
   const bar=document.querySelector(`.mod-bar[data-mi="${mi}"]`);
   if(bar) bar.style.width=pct+'%';
+  // update count
   const card=el.closest('.mod-card');
   const prog=card.querySelector('.mh-progress');
   if(prog) prog.textContent=`${done}/${mod.files.length}`;
@@ -1151,7 +1217,7 @@ function toggleModFile(el, mi, fname, col){
   if(isDone) showToast('✅ Completado');
 }
 
-// ── Flow tab ───────────────────────────────────────────
+/* ── FLOW TAB ────────────────────────────────────────────────── */
 function buildFlow(){
   const wrap=document.getElementById('flowSteps');
   wrap.innerHTML='';
@@ -1180,27 +1246,32 @@ function buildFlow(){
   });
 }
 
-// ── Semanas tab ────────────────────────────────────────
+/* ── SEMANAS TAB ─────────────────────────────────────────────── */
 function buildSemanas(){
   const wrap=document.getElementById('semanasWrap');
   const state=loadState();
   wrap.innerHTML='';
+
   const phases=[
     {id:'setup',  label:'SETUP · Semanas 1–3',   col:'var(--relax)',  range:[0,1,2]},
     {id:'build',  label:'CONSTRUCCIÓN · S4–7',    col:'var(--motive)', range:[3,4,5,6]},
     {id:'ia',     label:'IA + AUDIO · S8–10',     col:'var(--stoic)',  range:[7,8,9]},
     {id:'launch', label:'LANZAMIENTO · S11–12',   col:'var(--teal)',   range:[10,11]},
   ];
+
   phases.forEach(ph=>{
     const sec=document.createElement('div');
     sec.className='phase-section';
+
     const phDiv=document.createElement('div');
     phDiv.className='phase-header';
     phDiv.style.background=`${ph.col}10`;
     phDiv.innerHTML=`<div class="ph-label" style="background:${ph.col}20;color:${ph.col}">${ph.label}</div>`;
     sec.appendChild(phDiv);
+
     const grid=document.createElement('div');
     grid.className='weeks-grid';
+
     ph.range.forEach(wi=>{
       const wk=WEEKS[wi];
       const allTasks=[...wk.ivan,...wk.isaac];
@@ -1208,6 +1279,7 @@ function buildSemanas(){
       const pct=allTasks.length?Math.round(doneN/allTasks.length*100):0;
       const allDone=doneN===allTasks.length;
       const col=`var(--${wk.phaseCol})`;
+
       const card=document.createElement('div');
       card.className='week-card'+(allDone?' all-done':'');
       card.innerHTML=`
@@ -1250,7 +1322,8 @@ function buildSemanas(){
               </div>`;
             }).join('')}
           </div>
-        </div>`;
+        </div>
+        `;
       grid.appendChild(card);
     });
     sec.appendChild(grid);
@@ -1258,7 +1331,9 @@ function buildSemanas(){
   });
 }
 
-function toggleWeek(card){ card.classList.toggle('open'); }
+function toggleWeek(card){
+  card.classList.toggle('open');
+}
 
 function toggleWeekTask(el, wi, ti, owner){
   const state=loadState();
@@ -1273,6 +1348,8 @@ function toggleWeekTask(el, wi, ti, owner){
   ch.style.borderColor=d?col:'';
   ch.style.color=d?'#09090f':'';
   ch.textContent=d?'✓':'';
+
+  // update week bar + pct
   const wk=WEEKS[wi];
   const allTasks=[...wk.ivan,...wk.isaac];
   const doneN=allTasks.filter((_,t)=>state[`wk_${wi}_${t}`]).length;
@@ -1289,10 +1366,11 @@ function toggleWeekTask(el, wi, ti, owner){
   if(d) showToast(doneN===allTasks.length?'🎉 ¡Semana completada!':'✅ Tarea completada');
 }
 
-// ── Master progress ────────────────────────────────────
+/* ── MASTER PROGRESS ─────────────────────────────────────────── */
 function updateMaster(){
   const state=loadState();
   let total=0, done=0;
+  // count week tasks
   WEEKS.forEach((wk,wi)=>{
     const all=[...wk.ivan,...wk.isaac];
     all.forEach((_,ti)=>{ total++; if(state[`wk_${wi}_${ti}`]) done++; });
@@ -1302,26 +1380,32 @@ function updateMaster(){
   document.getElementById('masterPct').textContent=`${done} / ${total} tareas`;
 }
 
-// ── Reset ──────────────────────────────────────────────
+/* ── RESET ───────────────────────────────────────────────────── */
 function resetAll(){
-  if(!confirm('¿Reiniciar TODO el progreso para Ivan e Isaac? Esto se borrará también en Firebase.')) return;
-  const empty = {};
-  saveState(empty);
+  if(!confirm('¿Reiniciar TODO el progreso de Ivan e Isaac? Esto también borrará Firebase.')) return;
+  localStorage.removeItem(KEY);
+  // Also reset Firebase
+  if(typeof db !== 'undefined'){
+    db.collection('organigrama').doc('progreso').set({state:{},lastUpdated:Date.now(),lastUser:currentUser||'reset'});
+  }
   buildModules();
   buildSemanas();
   updateMaster();
-  document.querySelectorAll('.fi-check').forEach(ch=>{ ch.classList.remove('checked'); ch.textContent=''; });
+  // reset equipo checkboxes
+  document.querySelectorAll('.fi-check').forEach(ch=>{
+    ch.classList.remove('checked'); ch.textContent='';
+  });
   document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('done'));
-  showToast('↺ Progreso reiniciado en Firebase');
+  showToast('↺ Progreso reiniciado');
 }
 
-// ── INIT ───────────────────────────────────────────────
+/* ── INIT ────────────────────────────────────────────────────── */
 buildModules();
 buildFlow();
 buildSemanas();
 updateMaster();
 
-// Restore equipo tab
+// restore equipo tab checkboxes
 (function(){
   const state=loadState();
   document.querySelectorAll('.file-item').forEach(el=>{
@@ -1332,16 +1416,16 @@ updateMaster();
   });
 })();
 
-// ── Check who am I ─────────────────────────────────────
-const savedUser = localStorage.getItem('beliora_user');
-if(savedUser){
-  setUser(savedUser);
-} else {
-  // Show modal
-  document.getElementById('whoModal').style.display='flex';
-}
-
+// ── Firebase user check ────────────────────────────────
+(function(){
+  const saved = localStorage.getItem('beliora_user');
+  if(saved){
+    setUser(saved);
+  } else {
+    document.getElementById('whoModal').style.display = 'flex';
+    setSyncStatus('connecting');
+  }
+})();
 </script>
 </body>
 </html>
-
